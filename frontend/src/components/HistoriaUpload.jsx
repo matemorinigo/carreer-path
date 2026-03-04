@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { parseHistoriaHtml, isHtml } from '../utils/parseHistoriaHtml'
+import { parseHistoriaPdf, isPdf } from '../utils/parseHistoriaPdf'
 
 const SAMPLE_HINT = `Pegá acá el HTML de tu historia académica (desde el SIU) o el JSON exportado...`
 
@@ -63,7 +64,33 @@ export default function HistoriaUpload({ onGenerar }) {
     }
   }
 
+  async function handlePdfFile(file) {
+    setFileName(file.name)
+    setRawText('')
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const data = await parseHistoriaPdf(arrayBuffer)
+      if (data.length === 0) {
+        setParseError('No se encontraron materias en el PDF. Asegurate de subir la historia académica del SIU.')
+        setParsedData(null)
+        setFormat(null)
+        return
+      }
+      setParseError(null)
+      setParsedData(data)
+      setFormat('pdf')
+    } catch (err) {
+      setParseError('Error procesando PDF: ' + err.message)
+      setParsedData(null)
+      setFormat(null)
+    }
+  }
+
   function handleFileRead(file) {
+    if (isPdf(file)) {
+      handlePdfFile(file)
+      return
+    }
     const reader = new FileReader()
     reader.onload = (e) => {
       const text = e.target.result
@@ -125,7 +152,7 @@ export default function HistoriaUpload({ onGenerar }) {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".json,.html,.htm"
+          accept=".json,.html,.htm,.pdf"
           className="hidden"
           onChange={(e) => e.target.files[0] && handleFileRead(e.target.files[0])}
         />
@@ -136,7 +163,7 @@ export default function HistoriaUpload({ onGenerar }) {
           ) : (
             <>
               <p className="text-neutral-300 font-medium">
-                Arrastrá tu archivo <code className="text-emerald-400">.json</code> o <code className="text-emerald-400">.html</code> acá
+                Arrastrá tu archivo <code className="text-emerald-400">.pdf</code>, <code className="text-emerald-400">.json</code> o <code className="text-emerald-400">.html</code> acá
               </p>
               <p className="text-sm text-neutral-600">o hacé click para seleccionar</p>
             </>
@@ -173,7 +200,7 @@ export default function HistoriaUpload({ onGenerar }) {
         {parsedData && !parseError && (
           <p className="text-emerald-400 text-sm flex items-center gap-1.5">
             <span className="inline-block w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-            {format === 'html' ? 'HTML parseado' : 'JSON válido'} — {parsedData.length} materias detectadas
+            {format === 'pdf' ? 'PDF parseado' : format === 'html' ? 'HTML parseado' : 'JSON válido'} — {parsedData.length} materias detectadas
           </p>
         )}
       </div>

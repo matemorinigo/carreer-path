@@ -1,3 +1,4 @@
+const DAY_ORDER = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA']
 const DAY_MAP = {
   LU: 'Lunes',
   MA: 'Martes',
@@ -77,7 +78,7 @@ export default function MateriaCard({ materia }) {
       {/* Horarios */}
       {horarios && horarios.length > 0 && (
         <div className="space-y-1">
-          {horarios.map((h, i) => (
+          {[...horarios].sort((a, b) => DAY_ORDER.indexOf(a.dia) - DAY_ORDER.indexOf(b.dia)).map((h, i) => (
             <div
               key={i}
               className={`flex items-center gap-2 text-xs ${estimado ? 'opacity-60' : ''}`}

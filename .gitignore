@@ -89,6 +89,7 @@ htmlcov/
 scraper/input/historia_academica.html
 scraper/input/*.pdf
 test_browser.py
+publish-profile.xml
 
 # Docker
 .dockerignore

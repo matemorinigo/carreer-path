@@ -168,19 +168,9 @@ public class PlanificadorService {
                         if (!esADistancia(elegida.getModalidad())) {
                             horariosOcupados.addAll(elegida.getHorarios());
                         }
-                    } else if (primerCuatrimestre) {
-                        continue;
-                    } else {
-                        asignadas.add(MateriaAsignadaDTO.builder()
-                            .materiaId(materia.getId())
-                            .nombre(materia.getNombre())
-                            .sinOferta(true)
-                            .anual(materia.isAnual())
-                            .build());
                     }
-                } else if (primerCuatrimestre) {
-                    continue;
-                } else {
+                    // Tiene comisiones pero todas chocan: se saltea al próximo cuatrimestre
+                } else if (!primerCuatrimestre) {
                     asignadas.add(MateriaAsignadaDTO.builder()
                         .materiaId(materia.getId())
                         .nombre(materia.getNombre())

@@ -1,0 +1,454 @@
+# 🏗️ Arquitectura del Sistema
+
+## 1. Vista General
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      CARREER PATH SYSTEM                        │
+└─────────────────────────────────────────────────────────────────┘
+
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│   SCRAPER    │ ──→  │   BACKEND    │ ──→  │   FRONTEND   │
+│  (Python)    │      │ (Spring Boot)│      │   (React)    │
+└──────────────┘      └──────────────┘      └──────────────┘
+     HTML              JSON Input            REST API
+    ↓                   ↓                      ↓
+  Plans                 Plans                Visuali-
+  HTML                  Persisten-           zación
+                        tes en BD
+```
+
+---
+
+## 2. Scraper (Python)
+
+```
+┌─────────────────────────────────────┐
+│         HTML Input                  │
+│   (plan_estudios.html)              │
+└────────────────┬────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────┐
+│      BeautifulSoup Parser           │
+│                                     │
+│  1. Busca: <th class="sub">        │
+│  2. Busca: <a> en primer <td>      │
+│  3. Correlativas: split por " / "   │
+│  4. Horas: int(text)               │
+└────────────────┬────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────┐
+│          JSON Output                │
+│   (plan_estudios.json)              │
+│                                     │
+│  [                                  │
+│    {                                │
+│      "id": "3621",                  │
+│      "nombre": "Matemática",        │
+│      "correlativas": [],            │
+│      "horas": 4                     │
+│    }                                │
+│  ]                                  │
+└─────────────────────────────────────┘
+```
+
+---
+
+## 3. Backend (Spring Boot)
+
+### 3.1 Capas
+
+```
+┌─────────────────────────────────────┐
+│        REST API (Controller)         │
+│  POST /api/materias/ingestar        │
+│  GET  /api/materias                 │
+│  GET  /api/materias/{id}            │
+└────────────────┬────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────┐
+│    Business Logic (Services)         │
+│                                     │
+│  - DataIngestionService (3 fases)   │
+│  - MateriaService (CRUD)            │
+└────────────────┬────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────┐
+│   Data Access (Repository/JPA)      │
+│                                     │
+│  - MateriaRepository                │
+│  - JpaRepository<Materia, String>   │
+└────────────────┬────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────┐
+│      Database (H2/PostgreSQL)       │
+│                                     │
+│  - tabla: materias                  │
+│  - tabla: materia_correlativas      │
+└─────────────────────────────────────┘
+```
+
+### 3.2 Flujo de Ingesta (3 Fases)
+
+```
+┌─────────────────────────────────────────┐
+│  JSON Input (List<MateriaIngestionDTO>) │
+└────────────────┬────────────────────────┘
+                 │
+                 ▼
+    ┌───────────────────────────┐
+    │  FASE 1: Guardar Nodos    │
+    │  (Materias base, sin rel.)│
+    │                           │
+    │  INSERT INTO materias     │
+    │  (id, nombre, horas, ...  │
+    └───────────────┬───────────┘
+                    │
+                    ▼
+    ┌───────────────────────────┐
+    │ FASE 2: Correlativas      │
+    │ (Many-to-Many links)      │
+    │                           │
+    │ INSERT INTO               │
+    │ materia_correlativas      │
+    │ (materia_id, correlativa) │
+    └───────────────┬───────────┘
+                    │
+                    ▼
+    ┌───────────────────────────┐
+    │ FASE 3: Materias Padre    │
+    │ (Many-to-One links)       │
+    │                           │
+    │ UPDATE materias           │
+    │ SET materia_padre_id=...  │
+    └───────────────┬───────────┘
+                    │
+                    ▼
+         ┌─────────────────┐
+         │ IngestionResult │
+         │  (exito: true)  │
+         └─────────────────┘
+```
+
+### 3.3 Modelo de Datos
+
+```
+┌─────────────────────────────────┐
+│           MATERIA               │
+├─────────────────────────────────┤
+│ PK: id (VARCHAR 50)             │
+│    nombre (VARCHAR 255)         │
+│    es_obligatoria (BOOLEAN)     │
+│    horas (INTEGER)              │
+│ FK: materia_padre_id (opcional) │
+└─────────────────────────────────┘
+        │                  ▲
+        │ Many-to-Many     │ Many-to-One
+        │                  │
+        ▼                  │
+┌──────────────────────────┴───────┐
+│  MATERIA_CORRELATIVAS            │
+├──────────────────────────────────┤
+│ PK: materia_id                   │
+│ PK: correlativa_id               │
+│ (dos FKs a MATERIA)              │
+└──────────────────────────────────┘
+```
+
+### 3.4 DTOs (Evitan Ciclos de Serialización)
+
+```
+┌────────────────────────────────┐
+│ MateriaIngestionDTO (Input)    │
+├────────────────────────────────┤
+│ id: String                     │
+│ nombre: String                 │
+│ horas: Integer                 │
+│ esObligatoria: boolean         │
+│ padreId: String (opcional)     │
+│ correlativas: List<String>     │
+└────────────────────────────────┘
+           │
+           │ (DataIngestionService)
+           ▼
+┌────────────────────────────────┐
+│ Materia (Entity)               │
+├────────────────────────────────┤
+│ id: String                     │
+│ nombre: String                 │
+│ esObligatoria: boolean         │
+│ horas: Integer                 │
+│ materiaPadre: Materia          │
+│ correlativas: Set<Materia>     │
+└────────────────────────────────┘
+           │
+           │ (REST Response)
+           ▼
+┌────────────────────────────────┐
+│ MateriaDTO (Output)            │
+├────────────────────────────────┤
+│ id: String                     │
+│ nombre: String                 │
+│ esObligatoria: boolean         │
+│ horas: Integer                 │
+│ materiaPadreId: String         │
+│ correlativasIds: Set<String>   │
+└────────────────────────────────┘
+  (Evita serialización circular)
+```
+
+---
+
+## 4. Flujo Completo Scraper → Backend
+
+```
+┌──────────────────┐
+│  HTML Universidad│
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│ plan_parser.py   │
+│ (Scraper)        │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ plan_estudios.json               │
+│ [                                │
+│   {"id":"3621", "nombre":"...",  │
+│    "correlativas":[], "horas":4} │
+│ ]                                │
+└────────┬─────────────────────────┘
+         │
+         │ HTTP POST
+         │ /api/materias/ingestar
+         ▼
+┌──────────────────┐
+│ Spring Boot      │
+│ Backend          │
+└────────┬─────────┘
+         │
+         │ Fase 1-3 (Persistencia)
+         │
+         ▼
+┌──────────────────┐
+│ PostgreSQL / H2  │
+│ Database         │
+└────────┬─────────┘
+         │
+         │ HTTP GET /api/materias
+         │
+         ▼
+┌──────────────────┐
+│ React Frontend   │
+│ (próximo)        │
+└──────────────────┘
+```
+
+---
+
+## 5. Configuración Base de Datos
+
+### Desarrollo (H2 en memoria)
+
+```
+application.yml
+┌────────────────────────────────┐
+│ spring:                        │
+│   datasource:                  │
+│     url: jdbc:h2:mem:...      │
+│     driver: org.h2.Driver      │
+│   jpa:                         │
+│     ddl-auto: create-drop      │
+└────────────────────────────────┘
+         │
+         ▼ (JPA auto-genera tablas)
+┌────────────────────────────────┐
+│ BD en Memoria (no persiste)    │
+│ Perfecta para tests            │
+└────────────────────────────────┘
+```
+
+### Producción (PostgreSQL)
+
+```
+application-prod.yml
+┌────────────────────────────────┐
+│ spring:                        │
+│   datasource:                  │
+│     url: jdbc:postgresql://..  │
+│   jpa:                         │
+│     ddl-auto: validate         │
+│     dialect: Postgres10Dialect │
+└────────────────────────────────┘
+         │
+         ▼
+┌────────────────────────────────┐
+│ PostgreSQL (Persistente)       │
+│ Escalable y robusta            │
+└────────────────────────────────┘
+```
+
+---
+
+## 6. API REST Endpoints
+
+```
+┌─────────────────────────────────────────┐
+│ POST /api/materias/ingestar             │
+│ Carga un plan completo desde JSON       │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ GET /api/materias                       │
+│ Obtiene todas las materias              │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ GET /api/materias/{id}                  │
+│ Obtiene una materia                     │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ GET /api/materias/filter/obligatorias   │
+│ Filtra materias obligatorias            │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ GET /api/materias/filter/optativas      │
+│ Filtra materias optativas               │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ GET /api/materias/{padreId}/hijas       │
+│ Obtiene opciones de una Electiva        │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ GET /api/materias/estadisticas          │
+│ Estadísticas del plan                   │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ DELETE /api/materias                    │
+│ Elimina todas las materias              │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 7. Despliegue
+
+### Desarrollo Local
+
+```
+┌──────────────┐
+│ mvn spring-  │
+│ boot:run     │
+└──────┬───────┘
+       │ (H2)
+       ▼
+┌──────────────┐
+│              │
+│ :8080 (local)│
+│              │
+└──────────────┘
+```
+
+### Producción (Docker)
+
+```
+┌──────────────────────────┐
+│  docker-compose up       │
+└──────────────┬───────────┘
+               │
+       ┌───────┴────────┐
+       │                │
+       ▼                ▼
+    ┌─────────┐    ┌──────────┐
+    │PostgreSQL   Backend    │
+    │Container  │ Container │
+    └─────────┘    └──────────┘
+       (5432)        (8080)
+```
+
+---
+
+## 8. Agnóstica = Escalable
+
+```
+┌─────────────────────────────────────────┐
+│  Mismo Backend para cualquier Plan      │
+│                                         │
+│  Universidad A → plan_a.json ──┐       │
+│  Universidad B → plan_b.json ──┤──→ BD │
+│  Universidad C → plan_c.json ──┘       │
+│  Universidad D → plan_d.json ──┐       │
+│                                └────→  │
+│                                        │
+│  Sin cambios de código Java             │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 9. Tecnologías por Capa
+
+```
+┌─────────────────────────────────────┐
+│ Frontend                            │
+├─────────────────────────────────────┤
+│ React/Next.js 18+                   │
+│ TypeScript (opcional)               │
+│ Tailwind CSS (estilado)             │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ Backend                             │
+├─────────────────────────────────────┤
+│ Spring Boot 3.2                     │
+│ Java 21                             │
+│ Hibernate/JPA                       │
+│ Lombok                              │
+│ Maven                               │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ Datos                               │
+├─────────────────────────────────────┤
+│ H2 (desarrollo)                     │
+│ PostgreSQL (producción)             │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ Scraper                             │
+├─────────────────────────────────────┤
+│ Python 3.8+                         │
+│ BeautifulSoup 4                     │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ DevOps                              │
+├─────────────────────────────────────┤
+│ Docker                              │
+│ Docker Compose                      │
+│ Git                                 │
+└─────────────────────────────────────┘
+```
+
+---
+
+## Resumen
+
+1. **Scraper** → Extrae HTML → Genera JSON
+2. **Backend** → Consume JSON → 3 fases de ingesta → Persiste en BD
+3. **Frontend** → Consume API → Visualiza plan
+4. **BD** → Agnóstica (H2 dev / PostgreSQL prod)
+
+**Resultado**: Sistema escalable, desacoplado y agnóstico a la universidad.

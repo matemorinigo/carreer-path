@@ -1,0 +1,637 @@
+[
+  {
+    "id": "3621",
+    "nombre": "Matemática Discreta",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3622",
+    "nombre": "Análisis Matemático I",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3623",
+    "nombre": "Programación Inicial",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3624",
+    "nombre": "Introducción a los Sistemas de Información",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3625",
+    "nombre": "Sistemas de Numeración",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3626",
+    "nombre": "Principios de Calidad de Software",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3627",
+    "nombre": "Álgebra y Geometría Analítica I",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3628",
+    "nombre": "Física I",
+    "correlativas": [
+      "3622"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3629",
+    "nombre": "Programación Estructurada Básica",
+    "correlativas": [
+      "3623"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3630",
+    "nombre": "Introducción a la Gestión de Requisitos",
+    "correlativas": [
+      "3624"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3631",
+    "nombre": "Fundamentos de Sistemas Embebidos",
+    "correlativas": [
+      "3625"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3632",
+    "nombre": "Introducción a Proyectos Informáticos",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3633",
+    "nombre": "Análisis Matemático II",
+    "correlativas": [
+      "3622"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3634",
+    "nombre": "Física II",
+    "correlativas": [
+      "3628"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3635",
+    "nombre": "Tópicos de Programación",
+    "correlativas": [
+      "3629",
+      "3621"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3636",
+    "nombre": "Bases de Datos",
+    "correlativas": [
+      "3629",
+      "3621"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3637",
+    "nombre": "Análisis de Sistemas",
+    "correlativas": [
+      "3630"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3638",
+    "nombre": "Arquitectura de Computadoras",
+    "correlativas": [
+      "3631"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3676",
+    "nombre": "Responsabilidad Social Universitaria",
+    "correlativas": [
+      "3626"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3639",
+    "nombre": "Análisis Matemático III",
+    "correlativas": [
+      "3633"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3640",
+    "nombre": "Algoritmos y Estructuras de Datos",
+    "correlativas": [
+      "3635"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3641",
+    "nombre": "Bases de Datos Aplicada",
+    "correlativas": [
+      "3635",
+      "3636"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3642",
+    "nombre": "Principios de Diseño de Sistemas",
+    "correlativas": [
+      "3637",
+      "3626"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3643",
+    "nombre": "Redes de Computadoras",
+    "correlativas": [
+      "3638"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3644",
+    "nombre": "Gestión de las Organizaciones",
+    "correlativas": [
+      "3632"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3680",
+    "nombre": "Taller de Integración",
+    "correlativas": [
+      "3638",
+      "3636",
+      "3635",
+      "3632",
+      "3630",
+      "3626",
+      "3625",
+      "3624",
+      "3623",
+      "3621"
+    ],
+    "horas": 4,
+    "esObligatoria": false
+  },
+  {
+    "id": "3645",
+    "nombre": "Álgebra y Geometría Analítica II",
+    "correlativas": [
+      "3627"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3646",
+    "nombre": "Paradigmas de Programación",
+    "correlativas": [
+      "3640",
+      "3633"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3647",
+    "nombre": "Requisitos Avanzados",
+    "correlativas": [
+      "3642"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3648",
+    "nombre": "Diseño de Software",
+    "correlativas": [
+      "3635",
+      "3636",
+      "3642"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3649",
+    "nombre": "Sistemas Operativos",
+    "correlativas": [
+      "3629",
+      "3638"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3650",
+    "nombre": "Seguridad de la Información",
+    "correlativas": [
+      "3643",
+      "3638",
+      "3635"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3675",
+    "nombre": "Práctica Profesional Supervisada",
+    "correlativas": [
+      "3642"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3651",
+    "nombre": "Probabilidad y Estadística",
+    "correlativas": [
+      "3645",
+      "3639",
+      "3621"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3652",
+    "nombre": "Programación Avanzada",
+    "correlativas": [
+      "3641",
+      "3646"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3653",
+    "nombre": "Arquitecturas de Sistemas Software",
+    "correlativas": [
+      "3648"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3654",
+    "nombre": "Virtualización de Hardware",
+    "correlativas": [
+      "3643",
+      "3649"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3655",
+    "nombre": "Auditoría y Legislación",
+    "correlativas": [
+      "3650"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3656",
+    "nombre": "Estadística Aplicada",
+    "correlativas": [
+      "3651"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3657",
+    "nombre": "Autómatas y Gramática",
+    "correlativas": [
+      "3646"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3658",
+    "nombre": "Programación Concurrente",
+    "correlativas": [
+      "3646",
+      "3649"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3659",
+    "nombre": "Gestión Aplicada al Desarrollo de Software I",
+    "correlativas": [
+      "3644",
+      "3647",
+      "3648"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3660",
+    "nombre": "Sistemas Operativos Avanzados",
+    "correlativas": [
+      "3634",
+      "3654"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3661",
+    "nombre": "Gestión de Proyectos",
+    "correlativas": [
+      "3651",
+      "3650",
+      "3644"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3662",
+    "nombre": "Matemática Aplicada",
+    "correlativas": [
+      "3651"
+    ],
+    "horas": 6,
+    "esObligatoria": true
+  },
+  {
+    "id": "3663",
+    "nombre": "Lenguajes y Compiladores",
+    "correlativas": [
+      "3657"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3664",
+    "nombre": "Inteligencia Artificial",
+    "correlativas": [
+      "3651",
+      "3646"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3665",
+    "nombre": "Gestión Aplicada al Desarrollo de Software II",
+    "correlativas": [
+      "3653",
+      "3659"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3666",
+    "nombre": "Seguridad Aplicada y Forensia",
+    "correlativas": [
+      "3655",
+      "3652",
+      "3649"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3667",
+    "nombre": "Gestión de la Calidad en Procesos de Sistemas",
+    "correlativas": [
+      "3642",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3668",
+    "nombre": "Inteligencia Artificial Aplicada",
+    "correlativas": [
+      "3664",
+      "3656"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3669",
+    "nombre": "Innovación y Emprendedorismo",
+    "correlativas": [
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3670",
+    "nombre": "Ciencia de Datos",
+    "correlativas": [
+      "3664",
+      "3656"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3671",
+    "nombre": "Proyecto Final de Carrera",
+    "correlativas": [
+      "3656",
+      "3659",
+      "3660",
+      "3667"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "anual": true
+  },
+  {
+    "id": "3672",
+    "nombre": "Electiva I",
+    "correlativas": [
+      "3652",
+      "3653",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3673",
+    "nombre": "Electiva II",
+    "correlativas": [
+      "3652",
+      "3653",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3674",
+    "nombre": "Electiva III",
+    "correlativas": [
+      "3652",
+      "3653",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true
+  },
+  {
+    "id": "3677",
+    "nombre": "Lenguaje Orientado a Negocios",
+    "correlativas": [
+      "3652",
+      "3653",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "padreId": "3672"
+  },
+  {
+    "id": "3678",
+    "nombre": "Tecnologías en Seguridad",
+    "correlativas": [
+      "3652",
+      "3653",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "padreId": "3673"
+  },
+  {
+    "id": "3679",
+    "nombre": "Visión Artificial",
+    "correlativas": [
+      "3652",
+      "3653",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "padreId": "3674"
+  },
+  {
+    "id": "901",
+    "nombre": "Inglés Transversal Nivel I",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true,
+    "esTransversal": true
+  },
+  {
+    "id": "902",
+    "nombre": "Inglés Transversal Nivel II",
+    "correlativas": [
+      "901"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "esTransversal": true
+  },
+  {
+    "id": "903",
+    "nombre": "Inglés Transversal Nivel III",
+    "correlativas": [
+      "902"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "esTransversal": true
+  },
+  {
+    "id": "904",
+    "nombre": "Inglés Transversal Nivel IV",
+    "correlativas": [
+      "903"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "esTransversal": true
+  },
+  {
+    "id": "911",
+    "nombre": "Computación Transversal Nivel I",
+    "correlativas": [],
+    "horas": 4,
+    "esObligatoria": true,
+    "esTransversal": true
+  },
+  {
+    "id": "912",
+    "nombre": "Computación Transversal Nivel II",
+    "correlativas": [
+      "911"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "esTransversal": true
+  }
+]

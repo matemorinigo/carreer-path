@@ -1,0 +1,402 @@
+[
+  {
+    "codigo": "01023",
+    "nombre": "ANALISIS MATEMATICO I",
+    "origen": "Promoción",
+    "acta_resolucion": "16222022",
+    "fecha": "16/07/2022",
+    "nota": 9
+  },
+  {
+    "codigo": "01024",
+    "nombre": "ELEMENTOS DE PROGRAMACION",
+    "origen": "Examen",
+    "acta_resolucion": "10142022",
+    "fecha": "29/07/2022",
+    "nota": 6
+  },
+  {
+    "codigo": "01026",
+    "nombre": "TECNOLOGIA INGENIERIA Y SOCIEDAD",
+    "origen": "Promoción",
+    "acta_resolucion": "39252022",
+    "fecha": "03/12/2022",
+    "nota": 8
+  },
+  {
+    "codigo": "01027",
+    "nombre": "ALGEBRA Y GEOMETRIA ANALITICA I",
+    "origen": "Promoción",
+    "acta_resolucion": "39372022",
+    "fecha": "03/12/2022",
+    "nota": 9
+  },
+  {
+    "codigo": "01030",
+    "nombre": "FUNDAMENTOS DE TIC'S",
+    "origen": "Promoción",
+    "acta_resolucion": "39642022",
+    "fecha": "03/12/2022",
+    "nota": 7
+  },
+  {
+    "codigo": "01028",
+    "nombre": "MATEMATICA DISCRETA",
+    "origen": "Examen",
+    "acta_resolucion": "29812022",
+    "fecha": "20/12/2022",
+    "nota": 9
+  },
+  {
+    "codigo": "03621",
+    "nombre": "MATEMATICA DISCRETA",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 9
+  },
+  {
+    "codigo": "03622",
+    "nombre": "ANALISIS MATEMATICO I",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 9
+  },
+  {
+    "codigo": "03623",
+    "nombre": "PROGRAMACION INICIAL",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 6
+  },
+  {
+    "codigo": "03625",
+    "nombre": "SISTEMAS DE NUMERACION",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 7
+  },
+  {
+    "codigo": "03627",
+    "nombre": "ALGEBRA Y GEOMETRIA ANALITICA I",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 9
+  },
+  {
+    "codigo": "03629",
+    "nombre": "PROGRAMACION ESTRUCTURADA BASICA",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 6
+  },
+  {
+    "codigo": "03631",
+    "nombre": "FUNDAMENTOS DE SISTEMAS EMBEBIDOS",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 7
+  },
+  {
+    "codigo": "03632",
+    "nombre": "INTRODUCCION A LOS PROYECTOS INFORMATICOS",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 8
+  },
+  {
+    "codigo": "03633",
+    "nombre": "ANALISIS MATEMATICO II",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0431/2022",
+    "fecha": "21/12/2022",
+    "nota": 9
+  },
+  {
+    "codigo": "03628",
+    "nombre": "FISICA I",
+    "origen": "Promoción",
+    "acta_resolucion": "15362023",
+    "fecha": "17/07/2023",
+    "nota": 10
+  },
+  {
+    "codigo": "03635",
+    "nombre": "TOPICOS DE PROGRAMACION",
+    "origen": "Promoción",
+    "acta_resolucion": "15532023",
+    "fecha": "17/07/2023",
+    "nota": 8
+  },
+  {
+    "codigo": "03638",
+    "nombre": "ARQUITECTURA DE COMPUTADORAS",
+    "origen": "Promoción",
+    "acta_resolucion": "15682023",
+    "fecha": "17/07/2023",
+    "nota": 9
+  },
+  {
+    "codigo": "03639",
+    "nombre": "ANALISIS MATEMATICO III",
+    "origen": "Promoción",
+    "acta_resolucion": "15722023",
+    "fecha": "17/07/2023",
+    "nota": 9
+  },
+  {
+    "codigo": "03624",
+    "nombre": "INTRODUCCION A LOS SISTEMAS DE INFORMACION",
+    "origen": "Promoción",
+    "acta_resolucion": "48132023",
+    "fecha": "02/12/2023",
+    "nota": 7
+  },
+  {
+    "codigo": "03626",
+    "nombre": "PRINCIPIOS DE CALIDAD DE SOFTWARE",
+    "origen": "Promoción",
+    "acta_resolucion": "45032023",
+    "fecha": "02/12/2023",
+    "nota": 8
+  },
+  {
+    "codigo": "03640",
+    "nombre": "ALGORITMOS Y ESTRUCTURAS DE DATOS",
+    "origen": "Promoción",
+    "acta_resolucion": "48372023",
+    "fecha": "02/12/2023",
+    "nota": 8
+  },
+  {
+    "codigo": "03645",
+    "nombre": "ALGEBRA Y GEOMETRIA ANALITICA II",
+    "origen": "Promoción",
+    "acta_resolucion": "47772023",
+    "fecha": "02/12/2023",
+    "nota": 9
+  },
+  {
+    "codigo": "03636",
+    "nombre": "BASES DE DATOS",
+    "origen": "Examen",
+    "acta_resolucion": "47812023",
+    "fecha": "02/03/2024",
+    "nota": 6
+  },
+  {
+    "codigo": "03646",
+    "nombre": "PARADIGMAS DE PROGRAMACION",
+    "origen": "Examen",
+    "acta_resolucion": "52682023",
+    "fecha": "07/03/2024",
+    "nota": 6
+  },
+  {
+    "codigo": "03641",
+    "nombre": "BASES DE DATOS APLICADAS",
+    "origen": "Promoción",
+    "acta_resolucion": "15952024",
+    "fecha": "13/07/2024",
+    "nota": 8
+  },
+  {
+    "codigo": "03649",
+    "nombre": "SISTEMAS OPERATIVOS",
+    "origen": "Promoción",
+    "acta_resolucion": "12322024",
+    "fecha": "13/07/2024",
+    "nota": 8
+  },
+  {
+    "codigo": "03651",
+    "nombre": "PROBABILIDAD Y ESTADISTICA",
+    "origen": "Promoción",
+    "acta_resolucion": "16272024",
+    "fecha": "13/07/2024",
+    "nota": 9
+  },
+  {
+    "codigo": "03630",
+    "nombre": "INTRODUCCION A LA GESTION DE REQUISITOS",
+    "origen": "Examen",
+    "acta_resolucion": "12742024",
+    "fecha": "23/07/2024",
+    "nota": 5
+  },
+  {
+    "codigo": "03634",
+    "nombre": "FISICA II",
+    "origen": "Examen",
+    "acta_resolucion": "12822024",
+    "fecha": "23/07/2024",
+    "nota": 8
+  },
+  {
+    "codigo": "03676",
+    "nombre": "RESPONSABILIDAD SOCIAL UNIVERSITARIA",
+    "origen": "Examen",
+    "acta_resolucion": "13292024",
+    "fecha": "24/07/2024",
+    "nota": 5
+  },
+  {
+    "codigo": "00901",
+    "nombre": "INGLES NIVEL I",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0547/2024",
+    "fecha": "02/08/2024",
+    "nota": null
+  },
+  {
+    "codigo": "00902",
+    "nombre": "INGLES NIVEL II",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0547/2024",
+    "fecha": "02/08/2024",
+    "nota": null
+  },
+  {
+    "codigo": "00903",
+    "nombre": "INGLES NIVEL III",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0547/2024",
+    "fecha": "02/08/2024",
+    "nota": null
+  },
+  {
+    "codigo": "00904",
+    "nombre": "INGLES NIVEL IV",
+    "origen": "Equivalencia",
+    "acta_resolucion": "0547/2024",
+    "fecha": "02/08/2024",
+    "nota": null
+  },
+  {
+    "codigo": "03643",
+    "nombre": "REDES DE COMPUTADORAS",
+    "origen": "Promoción",
+    "acta_resolucion": "43262024",
+    "fecha": "30/11/2024",
+    "nota": 9
+  },
+  {
+    "codigo": "03644",
+    "nombre": "GESTION DE LAS ORGANIZACIONES",
+    "origen": "Promoción",
+    "acta_resolucion": "42892024",
+    "fecha": "30/11/2024",
+    "nota": 8
+  },
+  {
+    "codigo": "03657",
+    "nombre": "AUTOMATAS Y GRAMATICAS",
+    "origen": "Promoción",
+    "acta_resolucion": "39392024",
+    "fecha": "30/11/2024",
+    "nota": 9
+  },
+  {
+    "codigo": "03637",
+    "nombre": "ANALISIS DE SISTEMAS",
+    "origen": "Examen",
+    "acta_resolucion": "37632024",
+    "fecha": "05/12/2024",
+    "nota": 4
+  },
+  {
+    "codigo": "03652",
+    "nombre": "PROGRAMACION AVANZADA",
+    "origen": "Examen",
+    "acta_resolucion": "37892024",
+    "fecha": "10/12/2024",
+    "nota": 5
+  },
+  {
+    "codigo": "03654",
+    "nombre": "VIRTUALIZACION DE HARDWARE",
+    "origen": "Examen",
+    "acta_resolucion": "37912024",
+    "fecha": "13/12/2024",
+    "nota": 4
+  },
+  {
+    "codigo": "00911",
+    "nombre": "COMPUTACION NIVEL I",
+    "origen": "Promoción",
+    "acta_resolucion": "58852024",
+    "fecha": "08/03/2025",
+    "nota": 9
+  },
+  {
+    "codigo": "03642",
+    "nombre": "PRINCIPIOS DE DISEÑO DE SISTEMAS",
+    "origen": "Promoción",
+    "acta_resolucion": "14512025",
+    "fecha": "19/07/2025",
+    "nota": 9
+  },
+  {
+    "codigo": "03656",
+    "nombre": "ESTADISTICA APLICADA",
+    "origen": "Promoción",
+    "acta_resolucion": "16672025",
+    "fecha": "19/07/2025",
+    "nota": 8
+  },
+  {
+    "codigo": "03660",
+    "nombre": "SISTEMAS OPERATIVOS AVANZADOS",
+    "origen": "Promoción",
+    "acta_resolucion": "16302025",
+    "fecha": "19/07/2025",
+    "nota": 10
+  },
+  {
+    "codigo": "03663",
+    "nombre": "LENGUAJES Y COMPILADORES",
+    "origen": "Promoción",
+    "acta_resolucion": "13302025",
+    "fecha": "19/07/2025",
+    "nota": 7
+  },
+  {
+    "codigo": "03647",
+    "nombre": "REQUISITOS AVANZADOS",
+    "origen": "Promoción",
+    "acta_resolucion": "44162025",
+    "fecha": "06/12/2025",
+    "nota": 7
+  },
+  {
+    "codigo": "03648",
+    "nombre": "DISEÑO DE SOFTWARE",
+    "origen": "Promoción",
+    "acta_resolucion": "43922025",
+    "fecha": "06/12/2025",
+    "nota": 7
+  },
+  {
+    "codigo": "03650",
+    "nombre": "SEGURIDAD DE LA INFORMACION",
+    "origen": "Promoción",
+    "acta_resolucion": "42462025",
+    "fecha": "06/12/2025",
+    "nota": 8
+  },
+  {
+    "codigo": "03675",
+    "nombre": "PRACTICA PROFESIONAL SUPERVISADA",
+    "origen": "Promoción",
+    "acta_resolucion": "43272025",
+    "fecha": "06/12/2025",
+    "nota": 7
+  }
+]

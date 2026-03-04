@@ -1,0 +1,27 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+  h2:
+    console:
+      enabled: false
+  datasource:
+    url: jdbc:h2:mem:carreerpathdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    com.carreerpath: INFO
+    org.hibernate.SQL: WARN

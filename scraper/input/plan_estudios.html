@@ -1,0 +1,770 @@
+
+<!--------------------------------------------------------------------------- WRAPPER {dibujo la pagina} -->
+<div id="wrapper">
+
+    <!--------------------------------------------------------------------------- HEADER {logo, links, buscador, menu secciones} -->
+    <div id="header">
+
+        <h1 id="logo">
+            <a href="/index.php" title="Universidad Nacional de La Matanza"><span>UNLaM</span></a>
+        </h1>
+
+        <div id="outerlinks">
+            <a href="https://login.microsoftonline.com/">Servicio de Webmail</a>
+        </div>
+
+        <div id="searcher">
+            <form action="/index.php?seccion=-1&amp;accion=buscador" method="post" class="search">
+                <input type="text" class="text" id="searchingString" name="searchingString" value="buscar" onblur="if(this.value=='')value=this.defaultValue;" onfocus="if(this.value==this.defaultValue)value='';">
+                <input type="submit" class="button" value="" onclick="if(getElementById('searchingString').value==getElementById('searchingString').defaultValue) {getElementById('searchingString').value='';} return isEmptySearchingString(searchingString,'searchingString');">
+            </form>
+            <script language="javascript" type="text/javascript">
+                function isEmptySearchingString(theElement) {
+                    var s = theElement.value;
+                    if (s.length != 0) {
+                        return true;
+                    }
+                    theElement.focus();
+                    return false;
+                }
+            </script>
+        </div>
+
+        <div id="topNav">
+            <ul id="dropdown">
+    <li class="inicio"><a href="/index.php?seccion=1">inicio</a> </li><li class="Institucional"><a href="/index.php?seccion=2">Institucional</a> </li><li class="académicas"><a class="selected" href="/index.php?seccion=3">académicas</a> </li><li class="Investigaciones"><a href="/index.php?seccion=4">Investigaciones</a> </li><li class="CeDIT"><a href="/index.php?seccion=5">CeDIT</a> </li><li class="Posgrado"><a href="/index.php?seccion=6">Posgrado</a> </li></ul>        </div>
+
+    </div>
+
+    <!--------------------------------------------------------------------------- CONTENT (historial, menu principal, contenidos)-->
+    <div id="content" class="académicas">
+          <div class="tripleColumn">
+    <div id="photowide"><img src="imagenes/fotos/seccion/top_ingenieria.jpg"></div>  </div>
+
+  <div class="doubleColumn">
+        <div id="mainTitle">
+        <h2>Plan de estudio 2023 - Ingeniería Informática</h2>    </div>
+            <div id="mainContent">
+        <table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Primer Año</th>
+    </tr>
+  </thead>
+</table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Primer Cuatrimestre</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3621</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=635" title="Matemática Discreta">Matemática Discreta</a></td>
+      <td>---</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3622</th><td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=636" title="Análisis Matemático I">Análisis Matemático I</a></td>
+      <td>---</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3623</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=637" title="Programación Inicial">Programación Inicial</a></td>
+      <td>---</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3624</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=638" title="Introducción a los Sistemas de Información">Introducción a los Sistemas de Información</a></td>
+      <td>---</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3625</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=639" title="Sistemas de Numeración">Sistemas de Numeración</a></td>
+      <td>---</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3626</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=640" title="Principios de Calidad de Software">Principios de Calidad de Software</a></td>
+      <td>---</td>
+      <td>4</td>
+    </tr>
+
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Segundo Cuatrimestre</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3627</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=641" title="Álgebra y Geometría Analítica I">Álgebra y Geometría Analítica I</a></td>
+      <td>---</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3628</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=642" title="Física I">Física I</a></td>
+      <td>3622</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3629</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=643" title="Programación Estructurada Básica">Programación Estructurada Básica</a></td>
+      <td>3623</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3630</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=644" title="Introducción a la Gestión de Requisitos">Introducción a la Gestión de Requisitos</a></td>
+      <td>3624</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3631</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=645" title="Fundamentos de Sistemas Embebidos">Fundamentos de Sistemas Embebidos</a></td>
+      <td>3625</td>
+      <td>4</td>
+    </tr>
+
+    <tr>
+      <th class="sub">3632</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=646" title="Introducción a Proyectos Informáticos">Introducción a Proyectos Informáticos</a></td>
+      <td>---</td>
+      <td>4</td>
+    </tr>
+
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Segundo Año</th>
+    </tr>
+  </thead>
+</table>
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Primer Cuatrimestre </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3633</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=647" title="Análisis Matemático II">Análisis Matemático II</a></td>
+      <td>3622</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3634</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=648" title="Física II">Física II</a></td>
+      <td>3628</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3635</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=649" title="Tópicos de Programación">Tópicos de Programación</a></td>
+      <td>3629 / 3621</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3636</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=650" title="Bases de Datos">Bases de Datos</a></td>
+      <td>3629 / 3621</td>
+      <td>4</td>
+    </tr>
+<tr>
+      <th class="sub">3637</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=651" title="Análisis de Sistemas">Análisis de Sistemas</a></td>
+      <td>3630</td>
+      <td>4</td>
+    </tr>
+
+<tr>
+      <th class="sub">3638</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=652" title="Arquitectura de Computadoras">Arquitectura de Computadoras</a></td>
+      <td>3631</td>
+      <td>4</td>
+    </tr>
+
+    <tr>
+      <th class="sub">3676</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=653" title="Responsabilidad Social Universitaria">Responsabilidad Social Universitaria</a></td>
+      <td>3626</td>
+      <td>4</td>
+    </tr>
+
+
+</tbody></table><table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Segundo Cuatrimestre</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3639</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=654" title="Análisis Matemático III">Análisis Matemático III</a></td>
+      <td>3633</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3640</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=655" title="Algoritmos y Estructuras de Datos">Algoritmos y Estructuras de Datos</a></td>
+      <td>3635</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3641</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=656" title="Bases de Datos Aplicada">Bases de Datos Aplicada</a></td>
+      <td>3636</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3642</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=657" title="Principios de Diseño de Sistemas">Principios de Diseño de Sistemas</a></td>
+      <td>3637 / 3626</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3643</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=658" title="Redes de Computadoras">Redes de Computadoras</a></td>
+      <td>3638 / 3634</td>
+      <td>4</td>
+    </tr>
+
+    <tr>
+      <th class="sub">3644</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=659" title="Gestión de las Organizaciones">Gestión de las Organizaciones</a></td>
+      <td>3632</td>
+      <td>4</td>
+    </tr>
+
+    <tr>
+      <th class="sub">3680</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=660" title="Taller de Integración">Taller de Integración*</a></td>
+      <td>3638 / 3636 / 3635 / 3632 / 3630 / 3626 / 3625 / 3624 / 3623 / 3621</td>
+      <td>4</td>
+    </tr>
+
+</tbody></table>
+
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Tercer Año</th>
+    </tr>
+  </thead>
+</table>
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Primer Cuatrimestre </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3645</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=661" title="Álgebra y Geometría Analítica II">Álgebra y Geometría Analítica II</a></td>
+      <td>3627</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3646</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=662" title="Paradigmas de Programación">Paradigmas de Programación</a></td>
+      <td>3640 / 3633</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3647</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=663" title="Requisitos Avanzados">Requisitos Avanzados</a></td>
+      <td>3642</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3648</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=664" title="Diseño de Software">Diseño de Software</a></td>
+      <td>3642 / 3636</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3649</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=665" title="Sistemas Operativos">Sistemas Operativos</a></td>
+      <td>3638</td>
+      <td>4</td>
+    </tr>
+
+    <tr>
+      <th class="sub">3650</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=666" title="Seguridad de la Información">Seguridad de la Información</a></td>
+      <td>3643 / 3638 / 3635</td>
+      <td>4</td>
+    </tr>
+
+    <tr>
+      <th class="sub">3675</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=667" title="Práctica Profesional Supervisada">Práctica Profesional Supervisada</a></td>
+      <td>3642</td>
+      <td>4</td>
+    </tr>
+
+
+</tbody></table><table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Segundo Cuatrimestre</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3651</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=668" title="Probabilidad y Estadística">Probabilidad y Estadística</a></td>
+      <td>3645 / 3639 / 3621</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3652</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=669" title="Programación Avanzada">Programación Avanzada</a></td>
+      <td>3641 / 3646</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3653</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=670" title="Arquitecturas de Sistemas Software">Arquitecturas de Sistemas Software</a></td>
+      <td>3648</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3654</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=671" title="Virtualización de Hardware">Virtualización de Hardware</a></td>
+      <td>3649 / 3645 / 3640</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3655</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=672" title="Auditoría y Legislación">Auditoría y Legislación</a></td>
+      <td>3650</td>
+      <td>4</td>
+    </tr>
+
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Cuarto Año</th>
+    </tr>
+  </thead>
+</table>
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Primer Cuatrimestre </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3656</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=678" title="Estadística Aplicada">Estadística Aplicada</a></td>
+      <td>3651 / 3641</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3657</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=679" title="Autómatas y Gramática">Autómatas y Gramática</a> </td>
+      <td>3646</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3658</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=680" title="Programación Concurrente">Programación Concurrente</a></td>
+      <td>3654 / 3646</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3659</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=681" title="Gestión Aplicada al Desarrollo de Software I">Gestión Aplicada al Desarrollo de Software I</a></td>
+      <td>3653 / 3647 / 3644</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3660</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=682" title="Sistemas Operativos Avanzados">Sistemas Operativos Avanzados</a></td>
+      <td>3654</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3661</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=683" title="Gestión de Proyectos">Gestión de Proyectos</a></td>
+      <td>3651 / 3650 / 3644</td>
+      <td>4</td>
+    </tr>
+
+
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Segundo Cuatrimestre</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3662</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=684" title="Matemática Aplicada">Matemática Aplicada</a></td>
+      <td>3651</td>
+      <td>6</td>
+      </tr>
+    <tr>
+      <th class="sub">3663</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=685" title="Lenguajes y Compiladores">Lenguajes y Compiladores</a></td>
+      <td>3657</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3664</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=686" title="Inteligencia Artificial">Inteligencia Artificial</a></td>
+      <td>3651 / 3646</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3665</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=687" title="Gestión Aplicada al Desarrollo de Software II">Gestión Aplicada al Desarrollo de Software II</a></td>
+      <td>3659 / 3652</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3666</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=688" title="Seguridad Aplicada y Forensia">Seguridad Aplicada y Forensia</a></td>
+      <td>3655 / 3652 / 3649</td>
+      <td>4</td>
+    </tr>
+
+<tr>
+      <th class="sub">3667</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=689" title="Gestión de la Calidad en Procesos de Sistemas">Gestión de la Calidad en Procesos de Sistemas</a></td>
+      <td>3647</td>
+      <td>4</td>
+      </tr>
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Quinto Año</th>
+    </tr>
+  </thead>
+</table>
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Primer Cuatrimestre </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    
+    <tr>
+      <th class="sub">3668</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=690" title="Inteligencia Artificial Aplicada">Inteligencia Artificial Aplicada</a></td>
+      <td>3664 / 3656</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3669</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=691" title="Innovación y Emprendedorismo">Innovación y Emprendedorismo</a></td>
+      <td>3661</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3670</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=692" title="Ciencia de Datos">Ciencia de Datos</a></td>
+      <td>3664 / 3656</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3671</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=693" title="Proyecto Final de Carrera">Proyecto Final de Carrera**</a></td>
+      <td>3667 / 3661 / 3660 / 3659 / 3656</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">3672</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=694" title="Electiva I">Electiva I</a></td>
+      <td>3658 / 3661 / 3663</td>
+      <td>4</td>
+    </tr>
+
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5"> Segundo Cuatrimestre</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3673</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=695" title="Electiva II">Electiva II</a></td>
+      <td>3662 / 3666</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">3674</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/index.php?seccion=3&amp;idArticulo=696" title="Electiva III">Electiva III</a></td>
+      <td>3664 / 3665</td>
+      <td>4</td>
+    </tr>
+  
+
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Electivas I 2023</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+<th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3677</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=697" title="Lenguaje Orientado a Negocios">Lenguaje Orientado a Negocios</a></td>
+<td></td>
+           <td>4</td>
+      </tr>
+   
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Electivas II 2023</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3678</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=698" title="Tecnologías en Seguridad">Tecnologías en Seguridad</a></td>
+      <td></td>
+           <td>4</td>
+      </tr>
+   
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Electivas III 2023</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">3679</th>
+      <td><a href="https://ingenieria.unlam.edu.ar/preview.php?seccion=3&amp;idArticulo=699" title="Visión Artificial">Visión Artificial</a></td>
+      <td></td>
+           <td>4</td>
+      </tr>
+   
+</tbody></table>
+
+<table class="full">
+  <thead>
+    <tr>
+      <th colspan="5">Conocimientos comunes requeridos por HCS de la UNLaM</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Código</th>
+      <th>Asignatura</th>
+      <th>Correlatividad</th>
+      <th>Horas semanales</th>
+      </tr>
+    <tr>
+      <th class="sub">901</th>
+      <td> Inglés Transversal Nivel I</td>
+      <td>---</td>
+      <td>4</td>
+      </tr>
+    <tr>
+      <th class="sub">902</th>
+      <td>Inglés Transversal Nivel II</td>
+      <td>901</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">903</th>
+      <td>Inglés Transversal Nivel III</td>
+      <td>902</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th class="sub">904</th>
+      <td> Inglés Transversal Nivel IV</td>
+      <td>903</td>
+      <td>4</td>
+    </tr>
+<tr>
+      <th class="sub">911</th>
+      <td>Computación Transversal Nivel I</td>
+      <td>---</td>
+      <td>4</td>
+    </tr>
+<tr>
+      <th class="sub">912</th>
+      <td>Computación Transversal Nivel II</td>
+      <td>911</td>
+      <td>4</td>
+    </tr>
+
+</tbody>
+ </table>
+
+<p>*Materia Optativa</p><p>**Materia Anual </p>
+
+<p>
+      <strong>Título intermedio: Técnico Universitario en Desarrollo de Software. </strong>Para su obtención se requiere la aprobación de:<br>- Todas las materias de 1° a 3° año<br>- Niveles I y II de Inglés Transversal
+</p>
+
+<div id="downloads"><div class="mod-head">Descargas</div><div class="mod-body"><ul><li class="pdf"><a href="descargas/565_PlandeEstudiosInformatica2023-Final.pdf" target="_blank">Mapa Ingeniería Infomática</a></li><li class="pdf"><a href="descargas/565_CorrelativasIngenieriaInformatica.pdf" target="_blank">Correlativas Ingeniería Informática</a></li></ul><ul><li class="pdf"><a href="descargas/565_EquivalenciasplanesInformaticafinal.pdf" target="_blank">Plan de transiciones</a></li><li class="pdf"><a href="descargas/565_PlanInformatica2023.pdf" target="_blank">Plan Informática 2023</a></li></ul></div></div>    </div>
+      </div>
+
+  <div class="rightColumn">
+    <div id="mainNav"> <div class="mod-head">Menú principal</div>   <div class="mod-body">   <ul><li><a href="/index.php?seccion=3&amp;idArticulo=9">Carreras de grado</a></li><li><a href="/index.php?seccion=3&amp;idArticulo=14">Tecnicaturas</a></li><li><a href="/index.php?seccion=3&amp;idArticulo=15">Curso de Ingreso</a></li>   </ul> </div> </div>    <div id="tagcloud">
+      <div class="mod-head">Etiquetas</div>
+      <div class="mod-body">
+      <a rel="6278" href="/index.php?seccion=3&amp;idArticulo=248" style="font-size: 0.803158em; color: rgb(99, 42, 26); border-color: rgb(99, 42, 26);">Teoría de Circuitos II </a> <a rel="8075" href="/index.php?seccion=3&amp;idArticulo=59" style="font-size: 0.807527em; color: rgb(99, 43, 27); border-color: rgb(99, 43, 27);">Análisis de Software</a> <a rel="13135" href="/index.php?seccion=3&amp;idArticulo=227" style="font-size: 0.819829em; color: rgb(97, 45, 30); border-color: rgb(97, 45, 30);">Tecnología, Ingeniería y Sociedad</a> <a rel="11298" href="/index.php?seccion=3&amp;idArticulo=92" style="font-size: 0.815363em; color: rgb(97, 44, 29); border-color: rgb(97, 44, 29);">Física II</a> <a rel="8653" href="/index.php?seccion=3&amp;idArticulo=143" style="font-size: 0.808932em; color: rgb(99, 43, 27); border-color: rgb(99, 43, 27);">Electrónica I</a> <a rel="6698" href="/index.php?seccion=3&amp;idArticulo=328" style="font-size: 0.804179em; color: rgb(99, 43, 26); border-color: rgb(99, 43, 26);">Inglés Transversal Nivel I</a> <a rel="5735" href="/index.php?seccion=3&amp;idArticulo=177" style="font-size: 0.801838em; color: rgb(100, 42, 25); border-color: rgb(100, 42, 25);">Electromagnetismo e Introducción a los Medios de Enlace</a> <a rel="8948" href="/index.php?seccion=3&amp;idArticulo=43" style="font-size: 0.80965em; color: rgb(98, 43, 27); border-color: rgb(98, 43, 27);">Humanidades</a> <a rel="7015" href="/index.php?seccion=3&amp;idArticulo=76" style="font-size: 0.80495em; color: rgb(99, 43, 26); border-color: rgb(99, 43, 26);">Sistemas de Transmisión y Computación</a> <a rel="12088" href="/index.php?seccion=3&amp;idArticulo=211" style="font-size: 0.817284em; color: rgb(97, 44, 29); border-color: rgb(97, 44, 29);">Empresa y sus Estructuras</a> <a rel="5988" href="/index.php?seccion=3&amp;idArticulo=193" style="font-size: 0.802453em; color: rgb(100, 42, 26); border-color: rgb(100, 42, 26);">Proyecto</a> <a rel="8487" href="/index.php?seccion=3&amp;idArticulo=345" style="font-size: 0.808529em; color: rgb(99, 43, 27); border-color: rgb(99, 43, 27);">Industrias I</a> <a rel="5395" href="/index.php?seccion=3&amp;idArticulo=264" style="font-size: 0.801011em; color: rgb(100, 42, 25); border-color: rgb(100, 42, 25);">Economía</a> <a rel="7684" href="/index.php?seccion=3&amp;idArticulo=159" style="font-size: 0.806577em; color: rgb(99, 43, 27); border-color: rgb(99, 43, 27);">Ejercicio Profesional</a> <a rel="6647" href="/index.php?seccion=3&amp;idArticulo=312" style="font-size: 0.804055em; color: rgb(99, 43, 26); border-color: rgb(99, 43, 26);">Comunicación de Datos</a> <a rel="10488" href="/index.php?seccion=3&amp;idArticulo=108" style="font-size: 0.813394em; color: rgb(98, 44, 28); border-color: rgb(98, 44, 28);">Lenguajes y Compiladores </a> <a rel="5527" href="/index.php?seccion=3&amp;idArticulo=296" style="font-size: 0.801332em; color: rgb(100, 42, 25); border-color: rgb(100, 42, 25);">Probabilidad y Estadística</a> <a rel="4979" href="/index.php?seccion=3&amp;idArticulo=280" style="font-size: 0.8em; color: rgb(100, 42, 25); border-color: rgb(100, 42, 25);">Tecnología, Ingeniería y Sociedad</a> <a rel="251768" href="/index.php?seccion=3&amp;idArticulo=9" style="font-size: 1.4em; color: rgb(0, 121, 174); border-color: rgb(0, 121, 174);">Carreras de grado</a> <a rel="13207" href="/index.php?seccion=3&amp;idArticulo=124" style="font-size: 0.820004em; color: rgb(97, 45, 30); border-color: rgb(97, 45, 30);">Inglés Transversal Nivel I</a>       </div>
+    </div>
+    <script type="text/javascript">
+          $('#tagcloud a').tagcloud({
+            size: {start: 0.8, end: 1.4, unit: "em"},
+            color: {start: '#642A19', end: '#0079AE'}
+          });
+    </script>
+    <div id="contact">
+      <div class="mod-head">Contacto</div>
+      <div class="mod-body">
+        <ul>
+         <li><strong>Dirección:</strong> Florencio Varela 1903</li> 
+          <li><strong>Localidad:</strong> San Justo</li>
+          <li><strong>Provincia:</strong> Buenos Aires</li>
+          <li><strong>Código Postal:</strong> B1754JEC</li>
+          <li><strong>Teléfono:</strong> (54 11) 4480-8900 </li>
+          <li><strong>Fax:</strong> (54 11) 4480-8900 </li>
+          <li><strong>Horario Atención:</strong> 10 a 20 hs.</li>
+          <li><strong>Correo:</strong> <a href="mailto:infoingenieria@unlam.edu.ar">infoingenieria@unlam.edu.ar</a> </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+    </div>
+
+    <!--------------------------------------------------------------------------- FOOTER (contacto, informacion)-->
+    <div id="footer">
+        <p>Copyright © 2026 v1.0.0 UNLaM - Departamento de Ingeniería e Investigaciones Tecnológicas</p>
+    </div>
+
+    <!--------------------------------------------------------------------------- END (cierro el dibujo de la pagina )-->
+</div>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-DX7XWJTEJ1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DX7XWJTEJ1');
+</script>
+
+
+<div id="sb-container"><div id="sb-overlay"></div><div id="sb-wrapper"><div id="sb-title"><div id="sb-title-inner"></div><a id="sb-nav-close" title="Cerrar" onclick="Shadowbox.close()"></a></div><div id="sb-wrapper-inner"><div id="sb-body"><div id="sb-body-inner"></div><div id="sb-loading"><div id="sb-loading-inner"><span>cargando</span></div></div></div></div><div id="sb-info"><div id="sb-info-inner"><div id="sb-counter"></div><div id="sb-nav"><a id="sb-nav-next" title="Siguiente" onclick="Shadowbox.next()"></a><a id="sb-nav-play" title="Reproducir" onclick="Shadowbox.play()"></a><a id="sb-nav-pause" title="Pausa" onclick="Shadowbox.pause()"></a><a id="sb-nav-previous" title="Anterior" onclick="Shadowbox.previous()"></a></div></div></div></div></div>

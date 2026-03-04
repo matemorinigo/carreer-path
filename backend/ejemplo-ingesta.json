@@ -1,0 +1,121 @@
+[
+  {
+    "id": "3621",
+    "nombre": "Matemática Discreta",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3622",
+    "nombre": "Análisis Matemático I",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3623",
+    "nombre": "Programación Inicial",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3624",
+    "nombre": "Introducción a los Sistemas de Información",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3625",
+    "nombre": "Sistemas de Numeración",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3626",
+    "nombre": "Principios de Calidad de Software",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3627",
+    "nombre": "Álgebra y Geometría Analítica I",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3628",
+    "nombre": "Física I",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": ["3622"]
+  },
+  {
+    "id": "3629",
+    "nombre": "Programación Estructurada Básica",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": ["3623"]
+  },
+  {
+    "id": "3630",
+    "nombre": "Introducción a la Gestión de Requisitos",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": ["3624"]
+  },
+  {
+    "id": "3631",
+    "nombre": "Fundamentos de Sistemas Embebidos",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": ["3625"]
+  },
+  {
+    "id": "3632",
+    "nombre": "Introducción a Proyectos Informáticos",
+    "horas": 4,
+    "esObligatoria": true,
+    "correlativas": []
+  },
+  {
+    "id": "3672",
+    "nombre": "Electiva I",
+    "horas": 4,
+    "esObligatoria": false,
+    "correlativas": ["3658", "3661", "3663"]
+  },
+  {
+    "id": "3673",
+    "nombre": "Electiva II",
+    "horas": 4,
+    "esObligatoria": false,
+    "correlativas": ["3662", "3666"]
+  },
+  {
+    "id": "3674",
+    "nombre": "Electiva III",
+    "horas": 4,
+    "esObligatoria": false,
+    "correlativas": ["3664", "3665"]
+  },
+  {
+    "id": "901",
+    "nombre": "Inglés Transversal Nivel I",
+    "horas": 4,
+    "esObligatoria": false,
+    "correlativas": []
+  },
+  {
+    "id": "902",
+    "nombre": "Inglés Transversal Nivel II",
+    "horas": 4,
+    "esObligatoria": false,
+    "correlativas": ["901"]
+  }
+]

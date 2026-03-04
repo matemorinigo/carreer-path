@@ -19,6 +19,7 @@ export default function MateriaCard({ materia }) {
     anual,
     estimado,
     conflictoCon,
+    ofertaFueraDeTurno,
   } = materia
 
   const esDistancia = modalidad && modalidad.toLowerCase().includes('distancia')
@@ -98,6 +99,13 @@ export default function MateriaCard({ materia }) {
       {conflictoCon && (
         <p className="text-[11px] text-amber-400/70 leading-tight">
           ⚠ Movida por choque con {conflictoCon}
+        </p>
+      )}
+
+      {/* Oferta fuera del turno seleccionado */}
+      {ofertaFueraDeTurno && (
+        <p className="text-[11px] text-sky-400/70 leading-tight">
+          ℹ Existe oferta fuera de tu turno: {ofertaFueraDeTurno}
         </p>
       )}
     </div>

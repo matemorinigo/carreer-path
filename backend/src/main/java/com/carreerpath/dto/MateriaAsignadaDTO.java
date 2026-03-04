@@ -20,4 +20,5 @@ public class MateriaAsignadaDTO {
     private boolean anual;
     private boolean estimado;
     private String conflictoCon;
+    private String ofertaFueraDeTurno;
 }

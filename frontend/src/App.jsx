@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import HistoriaUpload from './components/HistoriaUpload'
 import PlanView from './components/PlanView'
 
@@ -73,12 +73,7 @@ export default function App() {
           <HistoriaUpload onGenerar={handleGenerar} />
         )}
 
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-32 gap-4">
-            <div className="w-12 h-12 border-4 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
-            <p className="text-neutral-500">Generando plan óptimo...</p>
-          </div>
-        )}
+        {loading && <LoadingScreen />}
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
@@ -95,6 +90,43 @@ export default function App() {
 
         {plan && <PlanView plan={plan} />}
       </main>
+    </div>
+  )
+}
+
+const LOADING_PHRASES = [
+  'Tranquilo, no te me apures que no vas a terminar la carrera antes de que cargue',
+  'Calculando cuántos cuatrimestres te faltan para ser libre...',
+  'Analizando correlativas como si fuera un grafo de la NASA...',
+  'Buscando comisiones que no te arruinen la vida...',
+  'Esquivando choques de horario como un campeón...',
+  'Rezándole a la UNLaM para que no cambie las correlativas...',
+  'Optimizando tu sufrimiento académico...',
+  'Preparando el plan que ojalá la universidad no te rompa...',
+]
+
+function LoadingScreen() {
+  const [phraseIdx, setPhraseIdx] = useState(() =>
+    Math.floor(Math.random() * LOADING_PHRASES.length),
+  )
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPhraseIdx((prev) => {
+        let next
+        do { next = Math.floor(Math.random() * LOADING_PHRASES.length) } while (next === prev)
+        return next
+      })
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="flex flex-col items-center justify-center py-32 gap-6">
+      <div className="w-14 h-14 border-4 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+      <p className="text-neutral-400 text-center max-w-md leading-relaxed animate-pulse">
+        {LOADING_PHRASES[phraseIdx]}
+      </p>
     </div>
   )
 }

@@ -172,6 +172,18 @@ public class PlanificadorService {
                         if (!esADistancia(elegida.getModalidad())) {
                             horariosOcupados.addAll(elegida.getHorarios());
                         }
+                    } else if (materia.isAnual()) {
+                        MateriaAsignadaDTO dto = MateriaAsignadaDTO.builder()
+                            .materiaId(materia.getId())
+                            .nombre(materia.getNombre())
+                            .sinOferta(true)
+                            .anual(true)
+                            .build();
+                        String resumenOferta = buildResumenOfertaFueraDeTurno(comisiones);
+                        if (resumenOferta != null) dto.setOfertaFueraDeTurno(resumenOferta);
+                        String prevConflicto = conflictosPendientes.remove(materiaId);
+                        if (prevConflicto != null) dto.setConflictoCon(prevConflicto);
+                        asignadas.add(dto);
                     } else {
                         String chocaCon = findConflictoNombre(comisiones, asignadas, comisionesPorMateria);
                         conflictosPendientes.put(materiaId, chocaCon);
@@ -487,6 +499,22 @@ public class PlanificadorService {
             .filter(c -> c.getComisionId().equals(asignada.getComisionId()))
             .findFirst()
             .ifPresent(c -> horariosOcupados.addAll(c.getHorarios()));
+    }
+
+    private String buildResumenOfertaFueraDeTurno(List<Comision> comisiones) {
+        if (comisiones == null || comisiones.isEmpty()) return null;
+        Comision primera = comisiones.get(0);
+        String dias = primera.getHorarios().stream()
+            .filter(h -> !esHorarioADistancia(h) && h.getDia() != null)
+            .map(h -> {
+                String dia = h.getDia();
+                String inicio = h.getHoraInicio() != null ? h.getHoraInicio().toString() : "?";
+                String fin = h.getHoraFin() != null ? h.getHoraFin().toString() : "?";
+                return dia + " " + inicio + "-" + fin;
+            })
+            .collect(Collectors.joining(", "));
+        if (dias.isEmpty()) return null;
+        return dias + " (" + (primera.getModalidad() != null ? primera.getModalidad() : "Sin modalidad") + ")";
     }
 
     private Set<String> buildAprobadasFromHistoria(List<HistoriaAcademicaDTO> historia) {

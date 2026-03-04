@@ -137,21 +137,33 @@ public class PlanificadorService {
                 .sorted(porPeso)
                 .collect(Collectors.toList());
 
-            // Mechar: reservar 1 slot por cuatrimestre para transversales si hay pendientes
-            int slotsTransv = Math.min(1, transvCursables.size());
+            // Mechar: detectar si la transversal tiene comisión a distancia
+            boolean transvADistancia = false;
+            if (!transvCursables.isEmpty()) {
+                String firstTransv = transvCursables.get(0);
+                List<Comision> comisTransv = comisionesPorMateria.getOrDefault(firstTransv, List.of());
+                transvADistancia = comisTransv.stream().anyMatch(c -> esADistancia(c.getModalidad()));
+            }
+
+            // A distancia: no reservar slot (será bonus). Presencial: reservar 1 slot (mechado normal).
+            int slotsTransv = transvADistancia ? 0 : Math.min(1, transvCursables.size());
             int limiteCores = modoOptimo ? Integer.MAX_VALUE : maxMateriasPorCuatrimestre - slotsTransv;
 
             List<String> ordenAsignacion = new ArrayList<>(coresCursables);
-            ordenAsignacion.addAll(transvCursables.subList(0, slotsTransv));
+            if (!transvCursables.isEmpty()) {
+                ordenAsignacion.add(transvCursables.get(0));
+            }
 
             // --- Paso D: Asignar comisiones sin conflictos de horario ---
             int coresAsignados = 0;
             for (String materiaId : ordenAsignacion) {
-                if (!modoOptimo && asignadas.size() >= maxMateriasPorCuatrimestre) break;
-
                 Materia materia = materiaMap.get(materiaId);
+                boolean esBonusDistancia = materia.isEsTransversal() && transvADistancia;
 
-                // Limitar cores para dejar lugar a transversales
+                // Bonus a distancia no cuenta contra el límite
+                if (!modoOptimo && !esBonusDistancia && asignadas.size() >= maxMateriasPorCuatrimestre) continue;
+
+                // Limitar cores para dejar lugar a transversales presenciales
                 if (!materia.isEsTransversal() && !modoOptimo && coresAsignados >= limiteCores) continue;
 
                 int prevSize = asignadas.size();

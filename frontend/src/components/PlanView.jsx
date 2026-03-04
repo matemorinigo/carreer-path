@@ -8,7 +8,7 @@ export default function PlanView({ plan }) {
         <StatCard
           label="Cuatrimestres"
           value={plan.totalCuatrimestres}
-          color="indigo"
+          color="green"
         />
         <StatCard
           label="Materias ya aprobadas"
@@ -42,7 +42,7 @@ export default function PlanView({ plan }) {
 
 function StatCard({ label, value, color }) {
   const colorMap = {
-    indigo: 'from-indigo-500/20 to-indigo-500/5 border-indigo-500/30 text-indigo-400',
+    green: 'from-green-500/20 to-green-500/5 border-green-500/30 text-green-400',
     emerald: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30 text-emerald-400',
     amber: 'from-amber-500/20 to-amber-500/5 border-amber-500/30 text-amber-400',
   }
@@ -50,7 +50,7 @@ function StatCard({ label, value, color }) {
   return (
     <div className={`bg-gradient-to-br ${colorMap[color]} border rounded-xl p-5 text-center`}>
       <p className={`text-3xl font-bold ${colorMap[color].split(' ').pop()}`}>{value}</p>
-      <p className="text-sm text-slate-400 mt-1">{label}</p>
+      <p className="text-sm text-neutral-500 mt-1">{label}</p>
     </div>
   )
 }

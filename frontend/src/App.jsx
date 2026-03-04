@@ -23,8 +23,14 @@ export default function App() {
       })
 
       if (!res.ok) {
-        const text = await res.text()
-        throw new Error(`Error ${res.status}: ${text}`)
+        let msg = 'Error inesperado del servidor'
+        try {
+          const body = await res.json()
+          if (body.error) msg = body.error
+        } catch {
+          /* response wasn't JSON */
+        }
+        throw new Error(msg)
       }
 
       const data = await res.json()
@@ -42,19 +48,19 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      <header className="border-b border-slate-700/50 backdrop-blur-sm bg-slate-900/50 sticky top-0 z-10">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-green-950/40 to-neutral-950 text-white">
+      <header className="border-b border-green-900/30 backdrop-blur-sm bg-neutral-950/70 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
-              <span className="text-indigo-400">Career</span>Path
+              <span className="text-emerald-400">Syllabus</span>
             </h1>
-            <p className="text-sm text-slate-400">Optimizador de trayectoria académica</p>
+            <p className="text-sm text-neutral-500">Optimizador de trayectoria académica</p>
           </div>
           {plan && (
             <button
               onClick={handleReset}
-              className="text-sm px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 transition-colors cursor-pointer"
+              className="text-sm px-4 py-2 rounded-lg bg-neutral-800/50 hover:bg-neutral-800 transition-colors cursor-pointer"
             >
               Nueva consulta
             </button>
@@ -69,8 +75,8 @@ export default function App() {
 
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
-            <div className="w-12 h-12 border-4 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
-            <p className="text-slate-400">Generando plan óptimo...</p>
+            <div className="w-12 h-12 border-4 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+            <p className="text-neutral-500">Generando plan óptimo...</p>
           </div>
         )}
 

@@ -75,18 +75,18 @@ export default function HistoriaUpload({ onGenerar }) {
   function handleDrop(e) {
     e.preventDefault()
     e.stopPropagation()
-    dropRef.current?.classList.remove('border-indigo-400')
+    dropRef.current?.classList.remove('border-emerald-400')
     const file = e.dataTransfer.files[0]
     if (file) handleFileRead(file)
   }
 
   function handleDragOver(e) {
     e.preventDefault()
-    dropRef.current?.classList.add('border-indigo-400')
+    dropRef.current?.classList.add('border-emerald-400')
   }
 
   function handleDragLeave() {
-    dropRef.current?.classList.remove('border-indigo-400')
+    dropRef.current?.classList.remove('border-emerald-400')
   }
 
   function handleSubmit() {
@@ -100,7 +100,7 @@ export default function HistoriaUpload({ onGenerar }) {
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="text-center space-y-3">
         <h2 className="text-3xl font-bold">Planificá tu carrera</h2>
-        <p className="text-slate-400">
+        <p className="text-neutral-500">
           Subí tu historia académica y te armamos el recorrido óptimo
         </p>
       </div>
@@ -112,7 +112,7 @@ export default function HistoriaUpload({ onGenerar }) {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center cursor-pointer hover:border-slate-500 transition-colors"
+        className="border-2 border-dashed border-neutral-700 rounded-xl p-8 text-center cursor-pointer hover:border-emerald-600/50 transition-colors"
       >
         <input
           ref={fileInputRef}
@@ -124,13 +124,13 @@ export default function HistoriaUpload({ onGenerar }) {
         <div className="space-y-2">
           <div className="text-4xl">📄</div>
           {fileName ? (
-            <p className="text-indigo-400 font-medium">{fileName}</p>
+            <p className="text-emerald-400 font-medium">{fileName}</p>
           ) : (
             <>
-              <p className="text-slate-300 font-medium">
-                Arrastrá tu archivo <code className="text-indigo-400">.json</code> o <code className="text-indigo-400">.html</code> acá
+              <p className="text-neutral-300 font-medium">
+                Arrastrá tu archivo <code className="text-emerald-400">.json</code> o <code className="text-emerald-400">.html</code> acá
               </p>
-              <p className="text-sm text-slate-500">o hacé click para seleccionar</p>
+              <p className="text-sm text-neutral-600">o hacé click para seleccionar</p>
             </>
           )}
         </div>
@@ -138,9 +138,9 @@ export default function HistoriaUpload({ onGenerar }) {
 
       {/* Separator */}
       <div className="flex items-center gap-4">
-        <div className="flex-1 h-px bg-slate-700" />
-        <span className="text-sm text-slate-500">o pegá el contenido</span>
-        <div className="flex-1 h-px bg-slate-700" />
+        <div className="flex-1 h-px bg-neutral-800" />
+        <span className="text-sm text-neutral-600">o pegá el contenido</span>
+        <div className="flex-1 h-px bg-neutral-800" />
       </div>
 
       {/* Textarea */}
@@ -154,7 +154,7 @@ export default function HistoriaUpload({ onGenerar }) {
           }}
           placeholder={SAMPLE_HINT}
           rows={10}
-          className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-sm font-mono text-slate-300 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 resize-y"
+          className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 text-sm font-mono text-neutral-300 placeholder-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 resize-y"
         />
         {parseError && (
           <p className="text-red-400 text-sm flex items-center gap-1.5">
@@ -171,12 +171,12 @@ export default function HistoriaUpload({ onGenerar }) {
       </div>
 
       {/* Max materias slider */}
-      <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6 space-y-4">
+      <div className="bg-neutral-900/30 border border-neutral-800/50 rounded-xl p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-slate-300">
+          <label className="text-sm font-medium text-neutral-300">
             Materias por cuatrimestre
           </label>
-          <span className="text-2xl font-bold text-indigo-400">{maxMaterias}</span>
+          <span className="text-2xl font-bold text-emerald-400">{maxMaterias}</span>
         </div>
         <input
           type="range"
@@ -184,9 +184,9 @@ export default function HistoriaUpload({ onGenerar }) {
           max={7}
           value={maxMaterias}
           onChange={(e) => setMaxMaterias(Number(e.target.value))}
-          className="w-full accent-indigo-500"
+          className="w-full accent-emerald-500"
         />
-        <div className="flex justify-between text-xs text-slate-500">
+        <div className="flex justify-between text-xs text-neutral-600">
           <span>2 (tranqui)</span>
           <span>7 (a full)</span>
         </div>
@@ -196,7 +196,7 @@ export default function HistoriaUpload({ onGenerar }) {
       <button
         onClick={handleSubmit}
         disabled={!isValid}
-        className="w-full py-4 rounded-xl font-semibold text-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30"
+        className="w-full py-4 rounded-xl font-semibold text-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
       >
         Generar plan óptimo
       </button>

@@ -14,17 +14,17 @@ export default function CuatrimestreCard({ cuatrimestre }) {
   return (
     <div className="relative">
       {/* Timeline connector */}
-      <div className="absolute left-6 top-0 bottom-0 w-px bg-slate-700/50" />
+      <div className="absolute left-6 top-0 bottom-0 w-px bg-neutral-800/50" />
 
       <div className="relative pl-14">
         {/* Timeline dot */}
-        <div className="absolute left-4 top-5 w-5 h-5 rounded-full bg-indigo-500 border-4 border-slate-900 z-10" />
+        <div className="absolute left-4 top-5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-neutral-950 z-10" />
 
         {/* Header */}
         <div className="flex items-baseline gap-3 mb-4">
           <span className="text-lg font-bold text-white">Año {year}</span>
-          <span className="text-sm text-slate-400">— {label}</span>
-          <span className="ml-auto text-xs text-slate-500 bg-slate-800 px-2.5 py-1 rounded-full">
+          <span className="text-sm text-neutral-500">— {label}</span>
+          <span className="ml-auto text-xs text-neutral-600 bg-neutral-900 px-2.5 py-1 rounded-full">
             {materias.length} {materias.length === 1 ? 'materia' : 'materias'}
           </span>
         </div>

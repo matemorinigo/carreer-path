@@ -9,14 +9,21 @@ const SKIP_RE = /^(INGENIER|Alumno:|Nro Documento:|Nº\s+Origen|Resolución|Pág
 
 async function extractText(arrayBuffer) {
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
-  const pages = []
+  const lines = []
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i)
     const content = await page.getTextContent()
-    const text = content.items.map((item) => item.str).join(' ')
-    pages.push(text)
+    let currentLine = ''
+    for (const item of content.items) {
+      if (item.str !== undefined) currentLine += item.str
+      if (item.hasEOL) {
+        lines.push(currentLine)
+        currentLine = ''
+      }
+    }
+    if (currentLine) lines.push(currentLine)
   }
-  return pages.join('\n')
+  return lines.join('\n')
 }
 
 function parseLines(rawText) {

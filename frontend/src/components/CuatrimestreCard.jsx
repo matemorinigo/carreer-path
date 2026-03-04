@@ -5,12 +5,26 @@ const CUATRI_LABELS = {
   2: '2do cuatrimestre',
 }
 
+const DAY_ORDER = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA']
+
+function earliestDay(materia) {
+  if (!materia.horarios?.length) return DAY_ORDER.length
+  return Math.min(
+    ...materia.horarios.map((h) => {
+      const idx = DAY_ORDER.indexOf(h.dia)
+      return idx >= 0 ? idx : DAY_ORDER.length
+    })
+  )
+}
+
 export default function CuatrimestreCard({ cuatrimestre, baseYear }) {
   const { numero, materias } = cuatrimestre
   const startYear = baseYear || new Date().getFullYear()
   const actualYear = startYear + Math.floor((numero - 1) / 2)
   const half = numero % 2 === 1 ? 1 : 2
   const label = CUATRI_LABELS[half] || `Cuatrimestre ${half}`
+
+  const sorted = [...materias].sort((a, b) => earliestDay(a) - earliestDay(b))
 
   return (
     <div className="relative">
@@ -32,7 +46,7 @@ export default function CuatrimestreCard({ cuatrimestre, baseYear }) {
 
         {/* Cards grid */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {materias.map((materia) => (
+          {sorted.map((materia) => (
             <MateriaCard key={materia.materiaId} materia={materia} />
           ))}
         </div>

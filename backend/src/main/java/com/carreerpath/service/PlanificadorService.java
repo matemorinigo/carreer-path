@@ -118,25 +118,43 @@ public class PlanificadorService {
                 break;
             }
 
-            // --- Paso C: Ordenar por peso de dependencia descendente, transversales al final ---
-            cursables.sort((a, b) -> {
-                Materia ma = materiaMap.get(a);
-                Materia mb = materiaMap.get(b);
-                if (ma.isEsTransversal() != mb.isEsTransversal()) {
-                    return ma.isEsTransversal() ? 1 : -1;
-                }
+            // --- Paso C: Ordenar por peso y separar cores de transversales ---
+            Comparator<String> porPeso = (a, b) -> {
                 int cmp = Integer.compare(
                     pesoDependencia.getOrDefault(b, 0),
                     pesoDependencia.getOrDefault(a, 0));
                 if (cmp != 0) return cmp;
                 return a.compareTo(b);
-            });
+            };
+
+            List<String> coresCursables = cursables.stream()
+                .filter(id -> !materiaMap.get(id).isEsTransversal())
+                .sorted(porPeso)
+                .collect(Collectors.toList());
+
+            List<String> transvCursables = cursables.stream()
+                .filter(id -> materiaMap.get(id).isEsTransversal())
+                .sorted(porPeso)
+                .collect(Collectors.toList());
+
+            // Mechar: reservar 1 slot por cuatrimestre para transversales si hay pendientes
+            int slotsTransv = Math.min(1, transvCursables.size());
+            int limiteCores = modoOptimo ? Integer.MAX_VALUE : maxMateriasPorCuatrimestre - slotsTransv;
+
+            List<String> ordenAsignacion = new ArrayList<>(coresCursables);
+            ordenAsignacion.addAll(transvCursables.subList(0, slotsTransv));
 
             // --- Paso D: Asignar comisiones sin conflictos de horario ---
-            for (String materiaId : cursables) {
+            int coresAsignados = 0;
+            for (String materiaId : ordenAsignacion) {
                 if (!modoOptimo && asignadas.size() >= maxMateriasPorCuatrimestre) break;
 
                 Materia materia = materiaMap.get(materiaId);
+
+                // Limitar cores para dejar lugar a transversales
+                if (!materia.isEsTransversal() && !modoOptimo && coresAsignados >= limiteCores) continue;
+
+                int prevSize = asignadas.size();
 
                 if (tieneHijas(materia, materiaMap)) {
                     MateriaAsignadaDTO electiva = resolverElectiva(
@@ -148,6 +166,7 @@ public class PlanificadorService {
                             agregarHorariosOcupados(electiva, comisionesPorMateria, horariosOcupados);
                         }
                         slotsResueltos.add(materiaId);
+                        if (!materia.isEsTransversal()) coresAsignados++;
                     }
                     continue;
                 }
@@ -198,6 +217,10 @@ public class PlanificadorService {
                     String prevConflicto = conflictosPendientes.remove(materiaId);
                     if (prevConflicto != null) dto.setConflictoCon(prevConflicto);
                     asignadas.add(dto);
+                }
+
+                if (!materia.isEsTransversal() && asignadas.size() > prevSize) {
+                    coresAsignados++;
                 }
             }
 

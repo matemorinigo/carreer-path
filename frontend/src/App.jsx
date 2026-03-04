@@ -10,16 +10,19 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  async function handleGenerar(historia, maxMaterias, turnos) {
+  async function handleGenerar(historia, maxMaterias, turnos, ofertaCustom) {
     setLoading(true)
     setError(null)
     setPlan(null)
 
     try {
+      const body = { historia, maxMaterias, turnos }
+      if (ofertaCustom) body.ofertaCustom = ofertaCustom
+
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ historia, maxMaterias, turnos }),
+        body: JSON.stringify(body),
       })
 
       if (!res.ok) {

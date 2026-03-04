@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { parseHistoriaHtml, isHtml } from '../utils/parseHistoriaHtml'
 import { parseHistoriaPdf, isPdf } from '../utils/parseHistoriaPdf'
+import { parseOfertaHtml } from '../utils/parseOfertaHtml'
 
 const SAMPLE_HINT = `Pegá acá el HTML de tu historia académica (desde el SIU) o el JSON exportado...`
 
@@ -13,7 +14,11 @@ export default function HistoriaUpload({ onGenerar }) {
   const [parsedData, setParsedData] = useState(null)
   const [format, setFormat] = useState(null)
   const [fileName, setFileName] = useState(null)
+  const [ofertaData, setOfertaData] = useState(null)
+  const [ofertaFileName, setOfertaFileName] = useState(null)
+  const [ofertaError, setOfertaError] = useState(null)
   const fileInputRef = useRef(null)
+  const ofertaInputRef = useRef(null)
   const dropRef = useRef(null)
 
   function validateAndParse(text) {
@@ -101,6 +106,29 @@ export default function HistoriaUpload({ onGenerar }) {
     reader.readAsText(file)
   }
 
+  function handleOfertaFile(file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const result = parseOfertaHtml(e.target.result)
+        if (result.totalMaterias === 0) {
+          setOfertaError('No se encontraron materias en el HTML. Revisá que sea la página de Oferta de Materias.')
+          setOfertaData(null)
+          setOfertaFileName(null)
+          return
+        }
+        setOfertaData(result.materias)
+        setOfertaFileName(`${file.name} — ${result.totalMaterias} materias, ${result.totalComisiones} comisiones`)
+        setOfertaError(null)
+      } catch (err) {
+        setOfertaError('Error parseando HTML de oferta: ' + err.message)
+        setOfertaData(null)
+        setOfertaFileName(null)
+      }
+    }
+    reader.readAsText(file)
+  }
+
   function handleDrop(e) {
     e.preventDefault()
     e.stopPropagation()
@@ -122,7 +150,7 @@ export default function HistoriaUpload({ onGenerar }) {
     const data = parsedData || validateAndParse(rawText)
     if (!data) return
     const turnosActivos = Object.entries(turnos).filter(([, v]) => v).map(([k]) => k)
-    onGenerar(data, modoOptimo ? 0 : maxMaterias, turnosActivos)
+    onGenerar(data, modoOptimo ? 0 : maxMaterias, turnosActivos, ofertaData)
   }
 
   function toggleTurno(turno) {
@@ -272,6 +300,56 @@ export default function HistoriaUpload({ onGenerar }) {
           </div>
         </label>
       </div>
+
+      {/* Oferta custom */}
+      <details className="group">
+        <summary className="flex items-center gap-2 cursor-pointer text-sm text-neutral-500 hover:text-neutral-300 transition-colors select-none">
+          <svg className="w-3.5 h-3.5 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+          Actualizar oferta de materias (opcional)
+        </summary>
+        <div className="mt-3 bg-neutral-900/30 border border-neutral-800/50 rounded-xl p-5 space-y-3">
+          <p className="text-xs text-neutral-500 leading-relaxed">
+            Andá a <span className="text-neutral-300">Intraconsulta</span> {'>'} <span className="text-neutral-300">Inscripciones</span> {'>'} <span className="text-neutral-300">Oferta de Materias</span>. Click derecho {'>'} Guardar como. Subí el <code className="text-emerald-400">.html</code> acá.
+          </p>
+          <button
+            type="button"
+            onClick={() => ofertaInputRef.current?.click()}
+            className="w-full py-2.5 rounded-lg border border-dashed border-neutral-700 text-sm text-neutral-400 hover:border-emerald-600/50 hover:text-neutral-300 transition-colors cursor-pointer"
+          >
+            {ofertaFileName ? ofertaFileName : 'Seleccionar archivo .html de oferta'}
+          </button>
+          <input
+            ref={ofertaInputRef}
+            type="file"
+            accept=".html,.htm"
+            className="hidden"
+            onChange={(e) => e.target.files[0] && handleOfertaFile(e.target.files[0])}
+          />
+          {ofertaError && (
+            <p className="text-red-400 text-xs flex items-center gap-1.5">
+              <span className="inline-block w-1.5 h-1.5 bg-red-400 rounded-full" />
+              {ofertaError}
+            </p>
+          )}
+          {ofertaData && !ofertaError && (
+            <div className="flex items-center justify-between">
+              <p className="text-emerald-400 text-xs flex items-center gap-1.5">
+                <span className="inline-block w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                Oferta cargada correctamente
+              </p>
+              <button
+                type="button"
+                onClick={() => { setOfertaData(null); setOfertaFileName(null); setOfertaError(null) }}
+                className="text-xs text-neutral-600 hover:text-red-400 transition-colors cursor-pointer"
+              >
+                Quitar
+              </button>
+            </div>
+          )}
+        </div>
+      </details>
 
       {/* Submit */}
       <button

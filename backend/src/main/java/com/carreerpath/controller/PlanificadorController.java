@@ -35,7 +35,8 @@ public class PlanificadorController {
             PlanOptimoDTO plan = planificadorService.generarPlanConHistoria(
                 request.getHistoria() != null ? request.getHistoria() : List.of(),
                 maxMaterias,
-                turnos);
+                turnos,
+                request.getOfertaCustom());
             return ResponseEntity.ok(plan);
         } catch (Exception e) {
             log.error("Error generando plan", e);

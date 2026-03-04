@@ -17,4 +17,6 @@ public class GenerarPlanRequestDTO {
 
     @Builder.Default
     private List<String> turnos = List.of("manana", "tarde", "noche");
+
+    private List<OfertaMateriaDTO> ofertaCustom;
 }

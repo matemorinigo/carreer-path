@@ -33,12 +33,19 @@ public class PlanificadorService {
     );
 
     @Transactional(readOnly = true)
-    public PlanOptimoDTO generarPlanConHistoria(List<HistoriaAcademicaDTO> historia, int maxMaterias, List<String> turnos) {
-        return generarPlanOptimo(maxMaterias, historia, turnos);
+    public PlanOptimoDTO generarPlanConHistoria(
+            List<HistoriaAcademicaDTO> historia, int maxMaterias,
+            List<String> turnos, List<OfertaMateriaDTO> ofertaCustom) {
+        return generarPlanOptimo(maxMaterias, historia, turnos, ofertaCustom);
     }
 
+    private static final java.time.format.DateTimeFormatter TIME_FMT =
+        java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+
     @Transactional(readOnly = true)
-    public PlanOptimoDTO generarPlanOptimo(int maxMateriasPorCuatrimestre, List<HistoriaAcademicaDTO> historia, List<String> turnos) {
+    public PlanOptimoDTO generarPlanOptimo(
+            int maxMateriasPorCuatrimestre, List<HistoriaAcademicaDTO> historia,
+            List<String> turnos, List<OfertaMateriaDTO> ofertaCustom) {
         boolean modoOptimo = maxMateriasPorCuatrimestre == 0;
 
         List<Materia> todasMaterias = materiaRepository.findAll();
@@ -50,8 +57,14 @@ public class PlanificadorService {
 
         log.info("Pesos de dependencia calculados para {} materias", pesoDependencia.size());
 
-        Map<String, List<Comision>> comisionesPorMateria = comisionRepository.findAll().stream()
-            .collect(Collectors.groupingBy(c -> c.getMateria().getId()));
+        Map<String, List<Comision>> comisionesPorMateria;
+        if (ofertaCustom != null && !ofertaCustom.isEmpty()) {
+            comisionesPorMateria = buildComisionesFromOferta(ofertaCustom, materiaMap);
+            log.info("Usando oferta custom: {} materias con comisiones", comisionesPorMateria.size());
+        } else {
+            comisionesPorMateria = comisionRepository.findAll().stream()
+                .collect(Collectors.groupingBy(c -> c.getMateria().getId()));
+        }
 
         Set<String> aprobadasIds = buildAprobadasFromHistoria(historia);
 
@@ -563,5 +576,54 @@ public class PlanificadorService {
         if (id == null) return "";
         String normalized = id.replaceFirst("^0+", "");
         return normalized.isEmpty() ? "0" : normalized;
+    }
+
+    private Map<String, List<Comision>> buildComisionesFromOferta(
+            List<OfertaMateriaDTO> oferta, Map<String, Materia> materiaMap) {
+
+        Map<String, List<Comision>> result = new HashMap<>();
+
+        for (OfertaMateriaDTO dto : oferta) {
+            String materiaId = normalizeId(dto.getCodigoMateria());
+            Materia materia = materiaMap.get(materiaId);
+            if (materia == null) continue;
+            if (dto.getComisiones() == null) continue;
+
+            List<Comision> comisiones = new ArrayList<>();
+            for (OfertaMateriaDTO.ComisionDTO comDto : dto.getComisiones()) {
+                List<Horario> horarios = new ArrayList<>();
+                if (comDto.getHorarios() != null) {
+                    for (OfertaMateriaDTO.HorarioDTO hDto : comDto.getHorarios()) {
+                        horarios.add(Horario.builder()
+                            .dia(hDto.getDia())
+                            .horaInicio(parseTime(hDto.getInicio()))
+                            .horaFin(parseTime(hDto.getFin()))
+                            .build());
+                    }
+                }
+
+                comisiones.add(Comision.builder()
+                    .comisionId(comDto.getId())
+                    .materia(materia)
+                    .sede(comDto.getSede())
+                    .modalidad(comDto.getModalidad())
+                    .horarios(horarios)
+                    .build());
+            }
+
+            result.put(materiaId, comisiones);
+        }
+
+        return result;
+    }
+
+    private LocalTime parseTime(String time) {
+        if (time == null || time.isBlank()) return null;
+        try {
+            return LocalTime.parse(time, TIME_FMT);
+        } catch (Exception e) {
+            log.warn("No se pudo parsear hora: {}", time);
+            return null;
+        }
     }
 }

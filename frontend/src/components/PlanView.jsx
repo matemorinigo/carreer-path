@@ -1,6 +1,14 @@
 import CuatrimestreCard from './CuatrimestreCard'
 
+function getBaseYear() {
+  const now = new Date()
+  const month = now.getMonth()
+  return month >= 7 ? now.getFullYear() + 1 : now.getFullYear()
+}
+
 export default function PlanView({ plan }) {
+  const baseYear = getBaseYear()
+
   return (
     <div className="space-y-8">
       {/* Stats */}
@@ -40,7 +48,7 @@ export default function PlanView({ plan }) {
       {/* Timeline */}
       <div className="space-y-6">
         {plan.cuatrimestres.map((cuatri) => (
-          <CuatrimestreCard key={cuatri.numero} cuatrimestre={cuatri} />
+          <CuatrimestreCard key={cuatri.numero} cuatrimestre={cuatri} baseYear={baseYear} />
         ))}
       </div>
     </div>

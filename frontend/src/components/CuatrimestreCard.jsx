@@ -5,9 +5,10 @@ const CUATRI_LABELS = {
   2: '2do cuatrimestre',
 }
 
-export default function CuatrimestreCard({ cuatrimestre }) {
+export default function CuatrimestreCard({ cuatrimestre, baseYear }) {
   const { numero, materias } = cuatrimestre
-  const year = Math.ceil(numero / 2)
+  const startYear = baseYear || new Date().getFullYear()
+  const actualYear = startYear + Math.floor((numero - 1) / 2)
   const half = numero % 2 === 1 ? 1 : 2
   const label = CUATRI_LABELS[half] || `Cuatrimestre ${half}`
 
@@ -22,7 +23,7 @@ export default function CuatrimestreCard({ cuatrimestre }) {
 
         {/* Header */}
         <div className="flex items-baseline gap-3 mb-4">
-          <span className="text-lg font-bold text-white">Año {year}</span>
+          <span className="text-lg font-bold text-white">{actualYear}</span>
           <span className="text-sm text-neutral-500">— {label}</span>
           <span className="ml-auto text-xs text-neutral-600 bg-neutral-900 px-2.5 py-1 rounded-full">
             {materias.length} {materias.length === 1 ? 'materia' : 'materias'}

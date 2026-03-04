@@ -156,6 +156,7 @@ public class PlanificadorService {
 
                 if (!comisiones.isEmpty()) {
                     Comision elegida = comisiones.stream()
+                        .sorted((a, b) -> Boolean.compare(esADistancia(b.getModalidad()), esADistancia(a.getModalidad())))
                         .filter(c -> comisionPermitidaPorTurno(c, turnos))
                         .filter(c -> esADistancia(c.getModalidad()) || !hayConflictoHorario(c.getHorarios(), horariosOcupados))
                         .findFirst()
@@ -399,11 +400,19 @@ public class PlanificadorService {
             List<Comision> comisiones = comisionesPorMateria.getOrDefault(opcion.getId(), List.of());
 
             if (!comisiones.isEmpty()) {
-                for (Comision comision : comisiones) {
+                List<Comision> ordenadas = comisiones.stream()
+                    .sorted((a, b) -> Boolean.compare(esADistancia(b.getModalidad()), esADistancia(a.getModalidad())))
+                    .collect(Collectors.toList());
+                for (Comision comision : ordenadas) {
                     if (!comisionPermitidaPorTurno(comision, turnos)) continue;
                     boolean sinConflicto = esADistancia(comision.getModalidad())
                         || !hayConflictoHorario(comision.getHorarios(), horariosOcupados);
                     if (sinConflicto) {
+                        if (esADistancia(comision.getModalidad())) {
+                            mejor = buildMateriaAsignada(opcion, comision);
+                            if (!conOferta) mejor.setEstimado(true);
+                            return mejor;
+                        }
                         int totalSlots = comision.getHorarios().size();
                         if (totalSlots < menorSlots) {
                             menorSlots = totalSlots;

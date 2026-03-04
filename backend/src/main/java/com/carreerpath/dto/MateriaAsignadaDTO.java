@@ -18,4 +18,5 @@ public class MateriaAsignadaDTO {
     private List<HorarioDTO> horarios;
     private boolean sinOferta;
     private boolean anual;
+    private boolean estimado;
 }

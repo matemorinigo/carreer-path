@@ -30,6 +30,13 @@ export default function PlanView({ plan }) {
         </div>
       )}
 
+      {/* Disclaimer */}
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-center">
+        <p className="text-amber-400 text-sm font-medium">
+          CUIDADO: Este plan está estimado y es válido solo si no te cagan de ningún lado. Lo más probable es que te caguen. Siempre te cagan.
+        </p>
+      </div>
+
       {/* Timeline */}
       <div className="space-y-6">
         {plan.cuatrimestres.map((cuatri) => (

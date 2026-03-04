@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,26 +26,29 @@ public class PlanificadorService {
 
     private static final int MAX_CUATRIMESTRES = 30;
 
+    private static final Map<String, LocalTime[]> TURNOS = Map.of(
+        "manana", new LocalTime[]{LocalTime.of(8, 0), LocalTime.of(13, 0)},
+        "tarde",  new LocalTime[]{LocalTime.of(13, 0), LocalTime.of(18, 0)},
+        "noche",  new LocalTime[]{LocalTime.of(18, 0), LocalTime.of(23, 0)}
+    );
+
     @Transactional(readOnly = true)
-    public PlanOptimoDTO generarPlanConHistoria(List<HistoriaAcademicaDTO> historia, int maxMaterias) {
-        return generarPlanOptimo(maxMaterias, historia);
+    public PlanOptimoDTO generarPlanConHistoria(List<HistoriaAcademicaDTO> historia, int maxMaterias, List<String> turnos) {
+        return generarPlanOptimo(maxMaterias, historia, turnos);
     }
 
     @Transactional(readOnly = true)
-    public PlanOptimoDTO generarPlanOptimo(int maxMateriasPorCuatrimestre, List<HistoriaAcademicaDTO> historia) {
+    public PlanOptimoDTO generarPlanOptimo(int maxMateriasPorCuatrimestre, List<HistoriaAcademicaDTO> historia, List<String> turnos) {
+        boolean modoOptimo = maxMateriasPorCuatrimestre == 0;
+
         List<Materia> todasMaterias = materiaRepository.findAll();
         Map<String, Materia> materiaMap = todasMaterias.stream()
             .collect(Collectors.toMap(Materia::getId, Function.identity()));
 
-        // --- Paso A: Grafo de dependencias y pesos ---
         Map<String, Set<String>> reverseDeps = buildReverseDependencyGraph(todasMaterias);
         Map<String, Integer> pesoDependencia = computeDependencyWeights(todasMaterias, reverseDeps);
 
         log.info("Pesos de dependencia calculados para {} materias", pesoDependencia.size());
-        pesoDependencia.entrySet().stream()
-            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .limit(10)
-            .forEach(e -> log.debug("  {} ({}): peso={}", materiaMap.get(e.getKey()).getNombre(), e.getKey(), e.getValue()));
 
         Map<String, List<Comision>> comisionesPorMateria = comisionRepository.findAll().stream()
             .collect(Collectors.groupingBy(c -> c.getMateria().getId()));
@@ -65,7 +69,6 @@ public class PlanificadorService {
 
         log.info("Estado inicial: {} aprobadas, {} pendientes (obligatorias)", completadas.size(), pendientes.size());
 
-        // --- Paso E: Iteración cuatrimestre a cuatrimestre ---
         List<CuatrimestreDTO> cuatrimestres = new ArrayList<>();
         int numCuatrimestre = 1;
         boolean primerCuatrimestre = true;
@@ -78,7 +81,6 @@ public class PlanificadorService {
             List<Horario> horariosOcupados = new ArrayList<>();
             Set<String> slotsResueltos = new HashSet<>();
 
-            // Materias anuales en curso se continúan en este cuatrimestre
             Set<String> anualesCompletandose = new HashSet<>();
             if (!esPrimerCuatrimestreDelAnio && !materiasAnualesEnCurso.isEmpty()) {
                 for (String anualId : materiasAnualesEnCurso) {
@@ -111,8 +113,7 @@ public class PlanificadorService {
                 .collect(Collectors.toList());
 
             if (cursables.isEmpty() && asignadas.isEmpty()) {
-                log.warn("Sin materias cursables. Quedan {} pendientes (posibles correlativas circulares o faltantes)",
-                    pendientes.size());
+                log.warn("Sin materias cursables. Quedan {} pendientes", pendientes.size());
                 break;
             }
 
@@ -132,17 +133,19 @@ public class PlanificadorService {
 
             // --- Paso D: Asignar comisiones sin conflictos de horario ---
             for (String materiaId : cursables) {
-                if (asignadas.size() >= maxMateriasPorCuatrimestre) break;
+                if (!modoOptimo && asignadas.size() >= maxMateriasPorCuatrimestre) break;
 
                 Materia materia = materiaMap.get(materiaId);
 
                 if (tieneHijas(materia, materiaMap)) {
                     MateriaAsignadaDTO electiva = resolverElectiva(
                         materia, materiaMap, comisionesPorMateria,
-                        horariosOcupados, completadas, primerCuatrimestre);
+                        horariosOcupados, completadas, primerCuatrimestre, turnos);
                     if (electiva != null) {
                         asignadas.add(electiva);
-                        agregarHorariosOcupados(electiva, comisionesPorMateria, horariosOcupados);
+                        if (!esADistancia(electiva.getModalidad())) {
+                            agregarHorariosOcupados(electiva, comisionesPorMateria, horariosOcupados);
+                        }
                         slotsResueltos.add(materiaId);
                     }
                     continue;
@@ -150,19 +153,32 @@ public class PlanificadorService {
 
                 List<Comision> comisiones = comisionesPorMateria.getOrDefault(materiaId, List.of());
 
-                if (primerCuatrimestre && !comisiones.isEmpty()) {
+                if (!comisiones.isEmpty()) {
                     Comision elegida = comisiones.stream()
-                        .filter(c -> !hayConflictoHorario(c.getHorarios(), horariosOcupados))
+                        .filter(c -> comisionPermitidaPorTurno(c, turnos))
+                        .filter(c -> esADistancia(c.getModalidad()) || !hayConflictoHorario(c.getHorarios(), horariosOcupados))
                         .findFirst()
                         .orElse(null);
 
                     if (elegida != null) {
                         MateriaAsignadaDTO dto = buildMateriaAsignada(materia, elegida);
                         dto.setAnual(materia.isAnual());
+                        dto.setEstimado(!primerCuatrimestre);
                         asignadas.add(dto);
-                        horariosOcupados.addAll(elegida.getHorarios());
+                        if (!esADistancia(elegida.getModalidad())) {
+                            horariosOcupados.addAll(elegida.getHorarios());
+                        }
+                    } else if (primerCuatrimestre) {
+                        continue;
+                    } else {
+                        asignadas.add(MateriaAsignadaDTO.builder()
+                            .materiaId(materia.getId())
+                            .nombre(materia.getNombre())
+                            .sinOferta(true)
+                            .anual(materia.isAnual())
+                            .build());
                     }
-                } else if (primerCuatrimestre && comisiones.isEmpty()) {
+                } else if (primerCuatrimestre) {
                     continue;
                 } else {
                     asignadas.add(MateriaAsignadaDTO.builder()
@@ -188,7 +204,6 @@ public class PlanificadorService {
                 .materias(asignadas)
                 .build());
 
-            // Completar materias no-anuales asignadas
             asignadas.stream()
                 .filter(a -> !anualesCompletandose.contains(a.getMateriaId()))
                 .forEach(a -> {
@@ -202,13 +217,11 @@ public class PlanificadorService {
                     }
                 });
 
-            // Completar anuales que terminan este cuatrimestre (2do del año)
             for (String anualId : anualesCompletandose) {
                 completadas.add(anualId);
                 materiasAnualesEnCurso.remove(anualId);
             }
 
-            // Marcar slots de electiva y todas sus hijas como completadas
             for (String slotId : slotsResueltos) {
                 completadas.add(slotId);
                 pendientes.remove(slotId);
@@ -239,10 +252,6 @@ public class PlanificadorService {
 
     // ── Paso A: Construcción del grafo inverso de dependencias ──
 
-    /**
-     * Para cada materia, identifica cuáles dependen directamente de ella.
-     * Si B tiene como correlativa a A, entonces A -> {B} en el grafo inverso.
-     */
     private Map<String, Set<String>> buildReverseDependencyGraph(List<Materia> materias) {
         Map<String, Set<String>> reverse = new HashMap<>();
         for (Materia m : materias) {
@@ -254,10 +263,6 @@ public class PlanificadorService {
         return reverse;
     }
 
-    /**
-     * Calcula el peso de dependencia transitiva usando BFS.
-     * El peso de una materia = cantidad de materias que dependen de ella (directa o indirectamente).
-     */
     private Map<String, Integer> computeDependencyWeights(
             List<Materia> materias,
             Map<String, Set<String>> reverseDeps) {
@@ -296,12 +301,14 @@ public class PlanificadorService {
         return visited.size();
     }
 
-    // ── Paso D: Resolución de conflictos horarios ──
+    // ── Filtros de horario y turno ──
 
     private boolean hayConflictoHorario(List<Horario> nuevos, List<Horario> ocupados) {
         for (Horario nuevo : nuevos) {
+            if (esHorarioADistancia(nuevo)) continue;
             if (nuevo.getHoraInicio() == null || nuevo.getHoraFin() == null) continue;
             for (Horario ocupado : ocupados) {
+                if (esHorarioADistancia(ocupado)) continue;
                 if (ocupado.getHoraInicio() == null || ocupado.getHoraFin() == null) continue;
                 if (nuevo.getDia() != null && nuevo.getDia().equals(ocupado.getDia())) {
                     if (nuevo.getHoraInicio().isBefore(ocupado.getHoraFin())
@@ -312,6 +319,40 @@ public class PlanificadorService {
             }
         }
         return false;
+    }
+
+    private boolean comisionPermitidaPorTurno(Comision comision, List<String> turnos) {
+        if (esADistancia(comision.getModalidad())) return true;
+        if (turnos.size() == 3) return true;
+
+        for (Horario h : comision.getHorarios()) {
+            if (esHorarioADistancia(h)) continue;
+            if (h.getHoraInicio() == null) continue;
+            if (!horarioDentroDelTurno(h, turnos)) return false;
+        }
+        return true;
+    }
+
+    private boolean horarioDentroDelTurno(Horario h, List<String> turnos) {
+        if (h.getHoraInicio() == null) return true;
+        for (String turno : turnos) {
+            LocalTime[] rango = TURNOS.get(turno);
+            if (rango == null) continue;
+            if (!h.getHoraInicio().isBefore(rango[0]) && h.getHoraInicio().isBefore(rango[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean esADistancia(String modalidad) {
+        if (modalidad == null) return false;
+        return modalidad.toLowerCase().contains("distancia");
+    }
+
+    private boolean esHorarioADistancia(Horario h) {
+        if (h.getDia() == null) return false;
+        return h.getDia().toLowerCase().contains("distancia");
     }
 
     // ── Resolución de Electivas ──
@@ -331,18 +372,14 @@ public class PlanificadorService {
                 .allMatch(c -> completadas.contains(c.getId())));
     }
 
-    /**
-     * Para un slot de electiva, busca entre las materias hijas la que mejor
-     * se ajuste al horario ya ocupado. Criterio: la que tenga la comisión con
-     * menor cantidad de slots horarios (menos invasiva en el cronograma).
-     */
     private MateriaAsignadaDTO resolverElectiva(
             Materia electivaSlot,
             Map<String, Materia> materiaMap,
             Map<String, List<Comision>> comisionesPorMateria,
             List<Horario> horariosOcupados,
             Set<String> completadas,
-            boolean conOferta) {
+            boolean conOferta,
+            List<String> turnos) {
 
         List<Materia> opciones = materiaMap.values().stream()
             .filter(m -> m.getMateriaPadre() != null
@@ -363,13 +400,17 @@ public class PlanificadorService {
         for (Materia opcion : opciones) {
             List<Comision> comisiones = comisionesPorMateria.getOrDefault(opcion.getId(), List.of());
 
-            if (conOferta && !comisiones.isEmpty()) {
+            if (!comisiones.isEmpty()) {
                 for (Comision comision : comisiones) {
-                    if (!hayConflictoHorario(comision.getHorarios(), horariosOcupados)) {
+                    if (!comisionPermitidaPorTurno(comision, turnos)) continue;
+                    boolean sinConflicto = esADistancia(comision.getModalidad())
+                        || !hayConflictoHorario(comision.getHorarios(), horariosOcupados);
+                    if (sinConflicto) {
                         int totalSlots = comision.getHorarios().size();
                         if (totalSlots < menorSlots) {
                             menorSlots = totalSlots;
                             mejor = buildMateriaAsignada(opcion, comision);
+                            if (!conOferta) mejor.setEstimado(true);
                         }
                     }
                 }

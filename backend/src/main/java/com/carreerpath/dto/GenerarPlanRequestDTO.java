@@ -14,4 +14,7 @@ public class GenerarPlanRequestDTO {
 
     @Builder.Default
     private int maxMaterias = 5;
+
+    @Builder.Default
+    private List<String> turnos = List.of("manana", "tarde", "noche");
 }

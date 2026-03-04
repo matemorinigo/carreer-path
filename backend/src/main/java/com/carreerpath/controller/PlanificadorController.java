@@ -23,12 +23,19 @@ public class PlanificadorController {
     public ResponseEntity<?> generarPlanOptimo(
             @RequestBody GenerarPlanRequestDTO request) {
 
-        int maxMaterias = Math.max(1, Math.min(request.getMaxMaterias(), 10));
+        int maxMaterias = request.getMaxMaterias() == 0
+            ? 0
+            : Math.max(1, Math.min(request.getMaxMaterias(), 10));
+
+        List<String> turnos = request.getTurnos() != null && !request.getTurnos().isEmpty()
+            ? request.getTurnos()
+            : List.of("manana", "tarde", "noche");
 
         try {
             PlanOptimoDTO plan = planificadorService.generarPlanConHistoria(
                 request.getHistoria() != null ? request.getHistoria() : List.of(),
-                maxMaterias);
+                maxMaterias,
+                turnos);
             return ResponseEntity.ok(plan);
         } catch (Exception e) {
             log.error("Error generando plan", e);

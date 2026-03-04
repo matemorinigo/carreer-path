@@ -6,6 +6,8 @@ const SAMPLE_HINT = `Pegá acá el HTML de tu historia académica (desde el SIU)
 export default function HistoriaUpload({ onGenerar }) {
   const [rawText, setRawText] = useState('')
   const [maxMaterias, setMaxMaterias] = useState(5)
+  const [modoOptimo, setModoOptimo] = useState(false)
+  const [turnos, setTurnos] = useState({ manana: true, tarde: true, noche: true })
   const [parseError, setParseError] = useState(null)
   const [parsedData, setParsedData] = useState(null)
   const [format, setFormat] = useState(null)
@@ -91,7 +93,13 @@ export default function HistoriaUpload({ onGenerar }) {
 
   function handleSubmit() {
     const data = parsedData || validateAndParse(rawText)
-    if (data) onGenerar(data, maxMaterias)
+    if (!data) return
+    const turnosActivos = Object.entries(turnos).filter(([, v]) => v).map(([k]) => k)
+    onGenerar(data, modoOptimo ? 0 : maxMaterias, turnosActivos)
+  }
+
+  function toggleTurno(turno) {
+    setTurnos(prev => ({ ...prev, [turno]: !prev[turno] }))
   }
 
   const isValid = parsedData !== null && !parseError
@@ -170,13 +178,44 @@ export default function HistoriaUpload({ onGenerar }) {
         )}
       </div>
 
-      {/* Max materias slider */}
+      {/* Turnos */}
+      <div className="bg-neutral-900/30 border border-neutral-800/50 rounded-xl p-6 space-y-4">
+        <label className="text-sm font-medium text-neutral-300">Turnos disponibles</label>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { key: 'manana', label: 'Mañana', desc: '8 a 13 hs' },
+            { key: 'tarde', label: 'Tarde', desc: '13 a 18 hs' },
+            { key: 'noche', label: 'Noche', desc: '18 a 23 hs' },
+          ].map(({ key, label, desc }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => toggleTurno(key)}
+              className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${
+                turnos[key]
+                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                  : 'bg-neutral-900/50 border-neutral-800 text-neutral-600'
+              }`}
+            >
+              <p className="font-medium text-sm">{label}</p>
+              <p className="text-[11px] mt-0.5 opacity-70">{desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Max materias slider + modo optimo */}
       <div className="bg-neutral-900/30 border border-neutral-800/50 rounded-xl p-6 space-y-4">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-neutral-300">
             Materias por cuatrimestre
           </label>
-          <span className="text-2xl font-bold text-emerald-400">{maxMaterias}</span>
+          {!modoOptimo && (
+            <span className="text-2xl font-bold text-emerald-400">{maxMaterias}</span>
+          )}
+          {modoOptimo && (
+            <span className="text-sm font-medium text-emerald-400">sin límite</span>
+          )}
         </div>
         <input
           type="range"
@@ -184,18 +223,33 @@ export default function HistoriaUpload({ onGenerar }) {
           max={7}
           value={maxMaterias}
           onChange={(e) => setMaxMaterias(Number(e.target.value))}
-          className="w-full accent-emerald-500"
+          disabled={modoOptimo}
+          className="w-full accent-emerald-500 disabled:opacity-30"
         />
-        <div className="flex justify-between text-xs text-neutral-600">
-          <span>2 (tranqui)</span>
-          <span>7 (a full)</span>
+        <div className="flex items-center justify-between">
+          <div className="flex justify-between text-xs text-neutral-600 flex-1">
+            <span>2 (tranqui)</span>
+            <span>7 (a full)</span>
+          </div>
         </div>
+        <label className="flex items-center gap-3 pt-2 border-t border-neutral-800/50 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={modoOptimo}
+            onChange={(e) => setModoOptimo(e.target.checked)}
+            className="w-4 h-4 accent-emerald-500 rounded"
+          />
+          <div>
+            <span className="text-sm text-neutral-300">Seleccionar lo óptimo</span>
+            <p className="text-[11px] text-neutral-600">Mete todas las que pueda sin choque de horario</p>
+          </div>
+        </label>
       </div>
 
       {/* Submit */}
       <button
         onClick={handleSubmit}
-        disabled={!isValid}
+        disabled={!isValid || !Object.values(turnos).some(Boolean)}
         className="w-full py-4 rounded-xl font-semibold text-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
       >
         Generar plan óptimo

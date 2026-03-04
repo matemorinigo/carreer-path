@@ -19,4 +19,5 @@ public class MateriaAsignadaDTO {
     private boolean sinOferta;
     private boolean anual;
     private boolean estimado;
+    private String conflictoCon;
 }

@@ -73,6 +73,7 @@ public class PlanificadorService {
         int numCuatrimestre = 1;
         boolean primerCuatrimestre = true;
         Set<String> materiasAnualesEnCurso = new HashSet<>();
+        Map<String, String> conflictosPendientes = new HashMap<>();
 
         while ((!pendientes.isEmpty() || !materiasAnualesEnCurso.isEmpty()) && numCuatrimestre <= MAX_CUATRIMESTRES) {
             boolean esPrimerCuatrimestreDelAnio = numCuatrimestre % 2 == 1;
@@ -164,19 +165,26 @@ public class PlanificadorService {
                         MateriaAsignadaDTO dto = buildMateriaAsignada(materia, elegida);
                         dto.setAnual(materia.isAnual());
                         dto.setEstimado(!primerCuatrimestre);
+                        String prevConflicto = conflictosPendientes.remove(materiaId);
+                        if (prevConflicto != null) dto.setConflictoCon(prevConflicto);
                         asignadas.add(dto);
                         if (!esADistancia(elegida.getModalidad())) {
                             horariosOcupados.addAll(elegida.getHorarios());
                         }
+                    } else {
+                        String chocaCon = findConflictoNombre(comisiones, asignadas, comisionesPorMateria);
+                        conflictosPendientes.put(materiaId, chocaCon);
                     }
-                    // Tiene comisiones pero todas chocan: se saltea al próximo cuatrimestre
                 } else if (!primerCuatrimestre) {
-                    asignadas.add(MateriaAsignadaDTO.builder()
+                    MateriaAsignadaDTO dto = MateriaAsignadaDTO.builder()
                         .materiaId(materia.getId())
                         .nombre(materia.getNombre())
                         .sinOferta(true)
                         .anual(materia.isAnual())
-                        .build());
+                        .build();
+                    String prevConflicto = conflictosPendientes.remove(materiaId);
+                    if (prevConflicto != null) dto.setConflictoCon(prevConflicto);
+                    asignadas.add(dto);
                 }
             }
 
@@ -414,6 +422,31 @@ public class PlanificadorService {
         }
 
         return mejor;
+    }
+
+    // ── Detección de conflictos ──
+
+    private String findConflictoNombre(
+            List<Comision> comisionesMateria,
+            List<MateriaAsignadaDTO> asignadas,
+            Map<String, List<Comision>> comisionesPorMateria) {
+
+        for (MateriaAsignadaDTO asignada : asignadas) {
+            if (asignada.getComisionId() == null) continue;
+            List<Horario> horariosAsignada = comisionesPorMateria
+                .getOrDefault(asignada.getMateriaId(), List.of()).stream()
+                .filter(c -> c.getComisionId().equals(asignada.getComisionId()))
+                .findFirst()
+                .map(Comision::getHorarios)
+                .orElse(List.of());
+
+            for (Comision c : comisionesMateria) {
+                if (hayConflictoHorario(c.getHorarios(), horariosAsignada)) {
+                    return asignada.getNombre();
+                }
+            }
+        }
+        return null;
     }
 
     // ── Helpers ──

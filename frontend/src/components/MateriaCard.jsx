@@ -17,6 +17,7 @@ export default function MateriaCard({ materia }) {
     sinOferta,
     anual,
     estimado,
+    conflictoCon,
   } = materia
 
   const esDistancia = modalidad && modalidad.toLowerCase().includes('distancia')
@@ -90,6 +91,13 @@ export default function MateriaCard({ materia }) {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Conflicto info */}
+      {conflictoCon && (
+        <p className="text-[11px] text-amber-400/70 leading-tight">
+          ⚠ Movida por choque con {conflictoCon}
+        </p>
       )}
     </div>
   )

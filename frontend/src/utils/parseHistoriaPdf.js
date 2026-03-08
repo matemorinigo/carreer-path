@@ -1,7 +1,7 @@
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'
-import * as pdfjsWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs'
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf'
+import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url'
 
-globalThis.pdfjsWorker = pdfjsWorker
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl
 
 const ENTRY_RE = /^(\d+)\s+(Promocion|Examen|Equivalencia)\s+(\d{3,5})\s+(.+)$/
 const TAIL_RE = /^(.+?)\s+(\S+)\s+(\d{2}\/\d{2}\/\d{4})\s*(\d+)?\s*$/

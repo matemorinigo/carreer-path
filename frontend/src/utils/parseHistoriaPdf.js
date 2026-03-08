@@ -1,24 +1,6 @@
-import * as pdfjsLib from 'pdfjs-dist'
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'
 
-const isModuleWorkerSupported = (() => {
-  try {
-    const blob = new Blob([''], { type: 'application/javascript' })
-    const url = URL.createObjectURL(blob)
-    const w = new Worker(url, { type: 'module' })
-    w.terminate()
-    URL.revokeObjectURL(url)
-    return true
-  } catch {
-    return false
-  }
-})()
-
-if (isModuleWorkerSupported) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl
-} else {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = ''
-}
+pdfjsLib.GlobalWorkerOptions.workerSrc = ''
 
 const ENTRY_RE = /^(\d+)\s+(Promocion|Examen|Equivalencia)\s+(\d{3,5})\s+(.+)$/
 const TAIL_RE = /^(.+?)\s+(\S+)\s+(\d{2}\/\d{2}\/\d{4})\s*(\d+)?\s*$/

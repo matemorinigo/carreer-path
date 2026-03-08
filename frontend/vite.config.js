@@ -5,6 +5,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   base: process.env.GITHUB_ACTIONS ? '/carreer-path/' : '/',
   plugins: [react(), tailwindcss()],
+  build: {
+    target: ['es2020', 'safari14'],
+  },
   server: {
     proxy: {
       '/api': 'http://localhost:8080',

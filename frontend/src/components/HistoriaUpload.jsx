@@ -73,8 +73,35 @@ export default function HistoriaUpload({ onGenerar }) {
     setFileName(file.name)
     setRawText('')
     try {
-      const arrayBuffer = await file.arrayBuffer()
-      const data = await parseHistoriaPdf(arrayBuffer)
+      let arrayBuffer
+      try {
+        if (typeof file.arrayBuffer === 'function') {
+          arrayBuffer = await file.arrayBuffer()
+        } else {
+          arrayBuffer = await new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result)
+            reader.onerror = () => reject(reader.error)
+            reader.readAsArrayBuffer(file)
+          })
+        }
+      } catch (err) {
+        setParseError(`Error leyendo archivo (paso 1 - arrayBuffer): ${err.message} | ${err.stack?.slice(0, 200)}`)
+        setParsedData(null)
+        setFormat(null)
+        return
+      }
+
+      let data
+      try {
+        data = await parseHistoriaPdf(arrayBuffer)
+      } catch (err) {
+        setParseError(`Error parseando PDF (paso 2 - pdfjs): ${err.message} | ${err.stack?.slice(0, 300)}`)
+        setParsedData(null)
+        setFormat(null)
+        return
+      }
+
       if (data.length === 0) {
         setParseError('No se encontraron materias en el PDF. Asegurate de subir la historia académica del SIU.')
         setParsedData(null)
@@ -85,7 +112,7 @@ export default function HistoriaUpload({ onGenerar }) {
       setParsedData(data)
       setFormat('pdf')
     } catch (err) {
-      setParseError('Error procesando PDF: ' + err.message)
+      setParseError(`Error inesperado: ${err.message} | ${err.stack?.slice(0, 300)}`)
       setParsedData(null)
       setFormat(null)
     }

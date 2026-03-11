@@ -16,6 +16,7 @@ function hasDisplayValue(value) {
 
 export default function MateriaCard({ materia, ofertaFieldVisibility }) {
   const {
+    materiaId,
     nombre,
     comisionId,
     sede,
@@ -72,9 +73,16 @@ export default function MateriaCard({ materia, ofertaFieldVisibility }) {
     <div className={`${bgColor} ${borderColor} border rounded-xl p-4 space-y-3 transition-all hover:scale-[1.02]`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-sm leading-tight text-neutral-200">
-          {nombre}
-        </h3>
+        <div className="space-y-1">
+          {hasDisplayValue(materiaId) && (
+            <span className="inline-flex rounded-md border border-neutral-700 bg-neutral-900/70 px-2 py-0.5 font-mono text-[10px] tracking-wide text-neutral-300">
+              COD {materiaId}
+            </span>
+          )}
+          <h3 className="font-semibold text-sm leading-tight text-neutral-200">
+            {nombre}
+          </h3>
+        </div>
         <div className="flex gap-1.5 shrink-0">
           {esDistancia && <Badge text="A distancia" color="sky" />}
           {estimado && <Badge text="Estimado" color="violet" />}

@@ -17,6 +17,7 @@ public class MateriaAsignadaDTO {
     private String modalidad;
     private List<HorarioDTO> horarios;
     private boolean sinOferta;
+    private boolean electiva;
     private boolean anual;
     private boolean estimado;
     private String conflictoCon;

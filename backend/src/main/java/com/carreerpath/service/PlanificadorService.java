@@ -486,6 +486,7 @@ public class PlanificadorService {
                     .materiaId(opcion.getId())
                     .nombre(opcion.getNombre())
                     .sinOferta(true)
+                    .electiva(true)
                     .build();
             }
         }
@@ -533,6 +534,7 @@ public class PlanificadorService {
             .modalidad(comision.getModalidad())
             .horarios(horarios)
             .sinOferta(false)
+            .electiva(materia.getMateriaPadre() != null)
             .build();
     }
 

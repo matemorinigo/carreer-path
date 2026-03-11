@@ -23,6 +23,7 @@ export default function MateriaCard({ materia, ofertaFieldVisibility }) {
     modalidad,
     horarios,
     sinOferta,
+    electiva,
     anual,
     estimado,
     conflictoCon,
@@ -36,6 +37,9 @@ export default function MateriaCard({ materia, ofertaFieldVisibility }) {
   }
 
   const ofertaItems = [
+    hasDisplayValue(materiaId)
+      ? { label: 'Código', value: materiaId }
+      : null,
     visibility.comisionId && hasDisplayValue(comisionId)
       ? { label: 'Comisión', value: comisionId }
       : null,
@@ -73,17 +77,11 @@ export default function MateriaCard({ materia, ofertaFieldVisibility }) {
     <div className={`${bgColor} ${borderColor} border rounded-xl p-4 space-y-3 transition-all hover:scale-[1.02]`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <div className="space-y-1">
-          {hasDisplayValue(materiaId) && (
-            <span className="inline-flex rounded-md border border-neutral-700 bg-neutral-900/70 px-2 py-0.5 font-mono text-[10px] tracking-wide text-neutral-300">
-              COD {materiaId}
-            </span>
-          )}
-          <h3 className="font-semibold text-sm leading-tight text-neutral-200">
-            {nombre}
-          </h3>
-        </div>
+        <h3 className="font-semibold text-sm leading-tight text-neutral-200">
+          {nombre}
+        </h3>
         <div className="flex gap-1.5 shrink-0">
+          {electiva && <Badge text="Electiva" color="fuchsia" />}
           {esDistancia && <Badge text="A distancia" color="sky" />}
           {estimado && <Badge text="Estimado" color="violet" />}
           {anual && <Badge text="Anual" color="amber" />}
@@ -149,6 +147,7 @@ function Badge({ text, color }) {
     amber: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     neutral: 'bg-neutral-800/50 text-neutral-500 border-neutral-700/50',
     emerald: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    fuchsia: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40',
     sky: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
     violet: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
   }

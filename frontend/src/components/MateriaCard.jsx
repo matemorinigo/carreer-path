@@ -8,7 +8,13 @@ const DAY_MAP = {
   SA: 'Sábado',
 }
 
-export default function MateriaCard({ materia }) {
+function hasDisplayValue(value) {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'string') return value.trim().length > 0
+  return true
+}
+
+export default function MateriaCard({ materia, ofertaFieldVisibility }) {
   const {
     nombre,
     comisionId,
@@ -21,6 +27,24 @@ export default function MateriaCard({ materia }) {
     conflictoCon,
     ofertaFueraDeTurno,
   } = materia
+
+  const visibility = ofertaFieldVisibility || {
+    comisionId: true,
+    modalidad: true,
+    sede: true,
+  }
+
+  const ofertaItems = [
+    visibility.comisionId && hasDisplayValue(comisionId)
+      ? { label: 'Comisión', value: comisionId }
+      : null,
+    visibility.modalidad && hasDisplayValue(modalidad)
+      ? { label: 'Modalidad', value: modalidad }
+      : null,
+    visibility.sede && hasDisplayValue(sede)
+      ? { label: 'Sede', value: sede }
+      : null,
+  ].filter(Boolean)
 
   const esDistancia = modalidad && modalidad.toLowerCase().includes('distancia')
 
@@ -59,20 +83,20 @@ export default function MateriaCard({ materia }) {
         </div>
       </div>
 
-      {/* Comision + Sede + Modalidad */}
-      {!sinOferta && (
+      {!sinOferta && ofertaItems.length > 0 && (
         <div className="space-y-1.5 text-xs text-neutral-500">
-          <div className="flex items-center gap-2 flex-wrap">
-            {comisionId && (
-              <span className={`px-2 py-0.5 rounded ${estimado ? 'bg-violet-500/10 text-violet-400/60' : 'bg-neutral-800/50 text-neutral-400'}`}>
-                Com. {comisionId}
-              </span>
-            )}
-            {modalidad && (
-              <ModalidadBadge modalidad={modalidad} />
-            )}
-          </div>
-          {sede && <p className="text-neutral-600">{sede}</p>}
+          {ofertaItems.map((item) => (
+            <div key={item.label} className="flex items-center gap-2">
+              <span className="text-neutral-500 min-w-20">{item.label}:</span>
+              {item.label === 'Modalidad' ? (
+                <ModalidadBadge modalidad={item.value} />
+              ) : (
+                <span className={`px-2 py-0.5 rounded ${estimado ? 'bg-violet-500/10 text-violet-400/60' : 'bg-neutral-800/50 text-neutral-300'}`}>
+                  {item.value}
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       )}
 

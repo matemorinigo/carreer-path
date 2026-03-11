@@ -17,7 +17,7 @@ function earliestDay(materia) {
   )
 }
 
-export default function CuatrimestreCard({ cuatrimestre, baseYear }) {
+export default function CuatrimestreCard({ cuatrimestre, baseYear, ofertaFieldVisibility }) {
   const { numero, materias } = cuatrimestre
   const startYear = baseYear || new Date().getFullYear()
   const actualYear = startYear + Math.floor((numero - 1) / 2)
@@ -47,7 +47,11 @@ export default function CuatrimestreCard({ cuatrimestre, baseYear }) {
         {/* Cards grid */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {sorted.map((materia) => (
-            <MateriaCard key={materia.materiaId} materia={materia} />
+            <MateriaCard
+              key={materia.materiaId}
+              materia={materia}
+              ofertaFieldVisibility={ofertaFieldVisibility}
+            />
           ))}
         </div>
       </div>

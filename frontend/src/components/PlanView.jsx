@@ -6,8 +6,25 @@ function getBaseYear() {
   return month >= 7 ? now.getFullYear() + 1 : now.getFullYear()
 }
 
+function hasValue(value) {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'string') return value.trim().length > 0
+  return true
+}
+
+function buildOfertaFieldVisibility(plan) {
+  const materias = (plan.cuatrimestres || []).flatMap((c) => c.materias || [])
+
+  return {
+    comisionId: materias.some((m) => hasValue(m.comisionId)),
+    modalidad: materias.some((m) => hasValue(m.modalidad)),
+    sede: materias.some((m) => hasValue(m.sede)),
+  }
+}
+
 export default function PlanView({ plan }) {
   const baseYear = getBaseYear()
+  const ofertaFieldVisibility = buildOfertaFieldVisibility(plan)
 
   return (
     <div className="space-y-8">
@@ -48,7 +65,12 @@ export default function PlanView({ plan }) {
       {/* Timeline */}
       <div className="space-y-6">
         {plan.cuatrimestres.map((cuatri) => (
-          <CuatrimestreCard key={cuatri.numero} cuatrimestre={cuatri} baseYear={baseYear} />
+          <CuatrimestreCard
+            key={cuatri.numero}
+            cuatrimestre={cuatri}
+            baseYear={baseYear}
+            ofertaFieldVisibility={ofertaFieldVisibility}
+          />
         ))}
       </div>
     </div>

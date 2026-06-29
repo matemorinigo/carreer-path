@@ -7,6 +7,11 @@ const BASE_URL = import.meta.env.VITE_API_URL || ''
 const API_URL = `${BASE_URL}/api/planificador/generar`
 const CAZADOR_STORAGE_KEY = 'cazador-utopias-state'
 
+function getCuatrimestreActual() {
+  const month = new Date().getMonth()
+  return month >= 7 ? 2 : 1
+}
+
 function loadCazadorState() {
   try {
     const raw = localStorage.getItem(CAZADOR_STORAGE_KEY)
@@ -39,8 +44,8 @@ export default function App() {
     if (saved) setResumePrompt(saved)
   }, [])
 
-  async function fetchPlan(historia, maxMaterias, turnos, ofertaCustom) {
-    const body = { historia, maxMaterias, turnos }
+  async function fetchPlan(historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio = 1) {
+    const body = { historia, maxMaterias, turnos, cuatrimestreInicio }
     if (ofertaCustom) body.ofertaCustom = ofertaCustom
 
     const res = await fetch(API_URL, {
@@ -86,6 +91,7 @@ export default function App() {
       maxMaterias: lastGenParams?.maxMaterias || 5,
       turnos: lastGenParams?.turnos || ['manana', 'tarde', 'noche'],
       ofertaCustom: lastGenParams?.ofertaCustom || null,
+      cuatrimestreInicio: getCuatrimestreActual(),
     }
     setCazadorMode(true)
     setCazadorState(state)
@@ -118,11 +124,14 @@ export default function App() {
         cuatrisResueltos: [...cazadorState.cuatrisResueltos, cuatriResuelto],
       }
 
+      const cuatrimestreReal = cazadorState.cuatrimestreInicio + newState.cuatrisResueltos.length
+
       const data = await fetchPlan(
         historiaActualizada,
         newState.maxMaterias,
         newState.turnos,
         newState.ofertaCustom,
+        cuatrimestreReal,
       )
 
       setPlan(data)
@@ -142,11 +151,14 @@ export default function App() {
     setError(null)
 
     try {
+      const cuatrimestreReal = (saved.cuatrimestreInicio || 1) + (saved.cuatrisResueltos?.length || 0)
+
       const data = await fetchPlan(
         saved.historiaAcumulada,
         saved.maxMaterias,
         saved.turnos,
         saved.ofertaCustom,
+        cuatrimestreReal,
       )
 
       setPlan(data)

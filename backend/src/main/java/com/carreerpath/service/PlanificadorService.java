@@ -35,8 +35,9 @@ public class PlanificadorService {
     @Transactional(readOnly = true)
     public PlanOptimoDTO generarPlanConHistoria(
             List<HistoriaAcademicaDTO> historia, int maxMaterias,
-            List<String> turnos, List<OfertaMateriaDTO> ofertaCustom) {
-        return generarPlanOptimo(maxMaterias, historia, turnos, ofertaCustom);
+            List<String> turnos, List<OfertaMateriaDTO> ofertaCustom,
+            int cuatrimestreInicio) {
+        return generarPlanOptimo(maxMaterias, historia, turnos, ofertaCustom, cuatrimestreInicio);
     }
 
     private static final java.time.format.DateTimeFormatter TIME_FMT =
@@ -45,7 +46,8 @@ public class PlanificadorService {
     @Transactional(readOnly = true)
     public PlanOptimoDTO generarPlanOptimo(
             int maxMateriasPorCuatrimestre, List<HistoriaAcademicaDTO> historia,
-            List<String> turnos, List<OfertaMateriaDTO> ofertaCustom) {
+            List<String> turnos, List<OfertaMateriaDTO> ofertaCustom,
+            int cuatrimestreInicio) {
         boolean modoOptimo = maxMateriasPorCuatrimestre == 0;
 
         List<Materia> todasMaterias = materiaRepository.findAll();
@@ -89,7 +91,8 @@ public class PlanificadorService {
         Map<String, String> conflictosPendientes = new HashMap<>();
 
         while ((!pendientes.isEmpty() || !materiasAnualesEnCurso.isEmpty()) && numCuatrimestre <= MAX_CUATRIMESTRES) {
-            boolean esPrimerCuatrimestreDelAnio = numCuatrimestre % 2 == 1;
+            int cuatrimestreReal = cuatrimestreInicio + numCuatrimestre - 1;
+            boolean esPrimerCuatrimestreDelAnio = cuatrimestreReal % 2 == 1;
 
             List<MateriaAsignadaDTO> asignadas = new ArrayList<>();
             List<Horario> horariosOcupados = new ArrayList<>();

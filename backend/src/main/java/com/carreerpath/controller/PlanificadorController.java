@@ -31,12 +31,15 @@ public class PlanificadorController {
             ? request.getTurnos()
             : List.of("manana", "tarde", "noche");
 
+        int cuatrimestreInicio = Math.max(1, request.getCuatrimestreInicio());
+
         try {
             PlanOptimoDTO plan = planificadorService.generarPlanConHistoria(
                 request.getHistoria() != null ? request.getHistoria() : List.of(),
                 maxMaterias,
                 turnos,
-                request.getOfertaCustom());
+                request.getOfertaCustom(),
+                cuatrimestreInicio);
             return ResponseEntity.ok(plan);
         } catch (Exception e) {
             log.error("Error generando plan", e);

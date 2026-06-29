@@ -15,14 +15,22 @@ function earliestDay(materia) {
   )
 }
 
+function esContinuacionAnual(materia) {
+  return materia.anual && materia.sinOferta
+}
+
 export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, ofertaFieldVisibility, onAvanzar, loading }) {
   const { numero, materias } = cuatrimestre
-  const [aprobadas, setAprobadas] = useState(new Set(materias.map(m => m.materiaId)))
+
+  const materiasSeleccionables = materias.filter(m => !esContinuacionAnual(m))
+  const continuacionesAnuales = materias.filter(m => esContinuacionAnual(m))
+
+  const [aprobadas, setAprobadas] = useState(new Set(materiasSeleccionables.map(m => m.materiaId)))
 
   const actualYear = baseYear + Math.floor((numero - 1) / 2)
   const half = numero % 2 === 1 ? 1 : 2
   const label = CUATRI_LABELS[half] || `Cuatrimestre ${half}`
-  const sorted = [...materias].sort((a, b) => earliestDay(a) - earliestDay(b))
+  const sorted = [...materiasSeleccionables].sort((a, b) => earliestDay(a) - earliestDay(b))
 
   function toggleMateria(materiaId) {
     setAprobadas(prev => {
@@ -34,15 +42,19 @@ export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, ofer
   }
 
   function handleAvanzar() {
-    const resultado = materias.map(m => ({
+    const resultadoSeleccionables = materiasSeleccionables.map(m => ({
       ...m,
       aprobada: aprobadas.has(m.materiaId),
     }))
-    onAvanzar(resultado)
+    const resultadoAnuales = continuacionesAnuales.map(m => ({
+      ...m,
+      aprobada: true,
+    }))
+    onAvanzar([...resultadoSeleccionables, ...resultadoAnuales])
   }
 
   const aprobadasCount = aprobadas.size
-  const totalCount = materias.length
+  const totalCount = materiasSeleccionables.length
 
   return (
     <div className="space-y-4">
@@ -61,6 +73,15 @@ export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, ofer
           Marcá las materias que aprobaste y avanzá al siguiente cuatrimestre
         </p>
       </div>
+
+      {continuacionesAnuales.length > 0 && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+          <p className="text-xs text-amber-400 font-medium mb-2">Continuación anual (se aprueban automáticamente)</p>
+          {continuacionesAnuales.map(m => (
+            <p key={m.materiaId} className="text-sm text-amber-300/70">{m.nombre}</p>
+          ))}
+        </div>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map((materia) => (

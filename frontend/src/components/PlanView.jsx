@@ -36,6 +36,10 @@ export default function PlanView({
   const baseYear = getBaseYear()
   const ofertaFieldVisibility = buildOfertaFieldVisibility(plan)
 
+  const totalMateriasPendientes = (plan.cuatrimestres || []).reduce(
+    (sum, c) => sum + (c.materias?.length || 0), 0
+  )
+
   if (cazadorMode && cazadorState) {
     const cuatriActual = plan.cuatrimestres?.[0]
     const cuatriNumeroActual = cuatriActual
@@ -58,8 +62,8 @@ export default function PlanView({
           />
           <StatCard
             label="Pendientes"
-            value={plan.materiasPendientes}
-            color={plan.materiasPendientes === 0 ? 'emerald' : 'amber'}
+            value={totalMateriasPendientes}
+            color={totalMateriasPendientes === 0 ? 'emerald' : 'amber'}
           />
         </div>
 
@@ -131,12 +135,12 @@ export default function PlanView({
         />
         <StatCard
           label="Pendientes"
-          value={plan.materiasPendientes}
-          color={plan.materiasPendientes === 0 ? 'emerald' : 'amber'}
+          value={totalMateriasPendientes}
+          color={totalMateriasPendientes === 0 ? 'emerald' : 'amber'}
         />
       </div>
 
-      {plan.materiasPendientes === 0 && (
+      {totalMateriasPendientes === 0 && (
         <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 text-center">
           <p className="text-emerald-400 font-medium">
             Todas las materias quedan cubiertas en {plan.totalCuatrimestres} cuatrimestres

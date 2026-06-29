@@ -1,14 +1,65 @@
 import { useState, useEffect } from 'react'
 import HistoriaUpload from './components/HistoriaUpload'
 import PlanView from './components/PlanView'
+import cazadorImg from './assets/alfaro.jpeg'
 
 const BASE_URL = import.meta.env.VITE_API_URL || ''
 const API_URL = `${BASE_URL}/api/planificador/generar`
+const CAZADOR_STORAGE_KEY = 'cazador-utopias-state'
+
+function loadCazadorState() {
+  try {
+    const raw = localStorage.getItem(CAZADOR_STORAGE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function saveCazadorState(state) {
+  localStorage.setItem(CAZADOR_STORAGE_KEY, JSON.stringify(state))
+}
+
+function clearCazadorState() {
+  localStorage.removeItem(CAZADOR_STORAGE_KEY)
+}
 
 export default function App() {
   const [plan, setPlan] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [cazadorMode, setCazadorMode] = useState(false)
+  const [cazadorState, setCazadorState] = useState(null)
+  const [cazadorLoading, setCazadorLoading] = useState(false)
+  const [resumePrompt, setResumePrompt] = useState(null)
+  const [lastGenParams, setLastGenParams] = useState(null)
+
+  useEffect(() => {
+    const saved = loadCazadorState()
+    if (saved) setResumePrompt(saved)
+  }, [])
+
+  async function fetchPlan(historia, maxMaterias, turnos, ofertaCustom) {
+    const body = { historia, maxMaterias, turnos }
+    if (ofertaCustom) body.ofertaCustom = ofertaCustom
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      let msg = 'Error inesperado del servidor'
+      try {
+        const errBody = await res.json()
+        if (errBody.error) msg = errBody.error
+      } catch { /* response wasn't JSON */ }
+      throw new Error(msg)
+    }
+
+    return res.json()
+  }
 
   async function handleGenerar(historia, maxMaterias, turnos, ofertaCustom) {
     setLoading(true)
@@ -16,28 +67,11 @@ export default function App() {
     setPlan(null)
 
     try {
-      const body = { historia, maxMaterias, turnos }
-      if (ofertaCustom) body.ofertaCustom = ofertaCustom
-
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-
-      if (!res.ok) {
-        let msg = 'Error inesperado del servidor'
-        try {
-          const body = await res.json()
-          if (body.error) msg = body.error
-        } catch {
-          /* response wasn't JSON */
-        }
-        throw new Error(msg)
-      }
-
-      const data = await res.json()
+      const data = await fetchPlan(historia, maxMaterias, turnos, ofertaCustom)
       setPlan(data)
+      setLastGenParams({ historia, maxMaterias, turnos, ofertaCustom })
+      setCazadorMode(false)
+      setCazadorState(null)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -45,9 +79,97 @@ export default function App() {
     }
   }
 
+  function handleActivarCazador() {
+    const state = {
+      historiaAcumulada: lastGenParams?.historia || [],
+      cuatrisResueltos: [],
+      maxMaterias: lastGenParams?.maxMaterias || 5,
+      turnos: lastGenParams?.turnos || ['manana', 'tarde', 'noche'],
+      ofertaCustom: lastGenParams?.ofertaCustom || null,
+    }
+    setCazadorMode(true)
+    setCazadorState(state)
+    saveCazadorState(state)
+  }
+
+  async function handleAvanzarCuatri(materiasConResultado) {
+    setCazadorLoading(true)
+    try {
+      const aprobadas = materiasConResultado.filter(m => m.aprobada)
+
+      const nuevasHistoria = aprobadas.map(m => ({
+        codigo: m.materiaId,
+        nombre: m.nombre,
+      }))
+
+      const historiaActualizada = [
+        ...cazadorState.historiaAcumulada,
+        ...nuevasHistoria,
+      ]
+
+      const cuatriResuelto = {
+        numero: (cazadorState.cuatrisResueltos.length || 0) + 1,
+        materias: materiasConResultado,
+      }
+
+      const newState = {
+        ...cazadorState,
+        historiaAcumulada: historiaActualizada,
+        cuatrisResueltos: [...cazadorState.cuatrisResueltos, cuatriResuelto],
+      }
+
+      const data = await fetchPlan(
+        historiaActualizada,
+        newState.maxMaterias,
+        newState.turnos,
+        newState.ofertaCustom,
+      )
+
+      setPlan(data)
+      setCazadorState(newState)
+      saveCazadorState(newState)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setCazadorLoading(false)
+    }
+  }
+
+  async function handleResumeCazador() {
+    const saved = resumePrompt
+    setResumePrompt(null)
+    setLoading(true)
+    setError(null)
+
+    try {
+      const data = await fetchPlan(
+        saved.historiaAcumulada,
+        saved.maxMaterias,
+        saved.turnos,
+        saved.ofertaCustom,
+      )
+
+      setPlan(data)
+      setCazadorMode(true)
+      setCazadorState(saved)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleDismissResume() {
+    setResumePrompt(null)
+    clearCazadorState()
+  }
+
   function handleReset() {
     setPlan(null)
     setError(null)
+    setCazadorMode(false)
+    setCazadorState(null)
+    clearCazadorState()
   }
 
   return (
@@ -57,6 +179,12 @@ export default function App() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
               <span className="text-emerald-400">Syllabus</span>
+              {cazadorMode && (
+                <span className="text-fuchsia-400 text-sm ml-3 font-normal inline-flex items-center gap-2">
+                  <img src={cazadorImg} alt="" className="w-7 h-7 rounded-full object-cover object-top ring-2 ring-fuchsia-500/50" />
+                  Cazador de Utopias
+                </span>
+              )}
             </h1>
             <p className="text-sm text-neutral-500">Optimizador de trayectoria académica</p>
           </div>
@@ -72,6 +200,32 @@ export default function App() {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-10">
+        {/* Resume prompt */}
+        {resumePrompt && !plan && !loading && (
+          <div className="bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-xl p-6 mb-8">
+            <p className="text-fuchsia-300 font-medium mb-1">
+              Tenés una sesión del Cazador de Utopias en curso
+            </p>
+            <p className="text-neutral-500 text-sm mb-4">
+              {resumePrompt.cuatrisResueltos.length} cuatrimestre{resumePrompt.cuatrisResueltos.length !== 1 ? 's' : ''} completado{resumePrompt.cuatrisResueltos.length !== 1 ? 's' : ''}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleResumeCazador}
+                className="px-4 py-2 rounded-lg bg-fuchsia-600 hover:bg-fuchsia-500 transition-colors text-sm font-medium cursor-pointer"
+              >
+                Continuar
+              </button>
+              <button
+                onClick={handleDismissResume}
+                className="px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors text-sm text-neutral-400 cursor-pointer"
+              >
+                Empezar de cero
+              </button>
+            </div>
+          </div>
+        )}
+
         {!plan && !loading && (
           <HistoriaUpload onGenerar={handleGenerar} />
         )}
@@ -91,7 +245,16 @@ export default function App() {
           </div>
         )}
 
-        {plan && <PlanView plan={plan} />}
+        {plan && (
+          <PlanView
+            plan={plan}
+            cazadorMode={cazadorMode}
+            cazadorState={cazadorState}
+            onActivarCazador={handleActivarCazador}
+            onAvanzarCuatri={handleAvanzarCuatri}
+            cazadorLoading={cazadorLoading}
+          />
+        )}
       </main>
     </div>
   )

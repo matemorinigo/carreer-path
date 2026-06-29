@@ -1,4 +1,7 @@
 import CuatrimestreCard from './CuatrimestreCard'
+import CazadorCuatrimestreActivo from './CazadorCuatrimestreActivo'
+import CazadorHistorial from './CazadorHistorial'
+import cazadorImg from '../assets/alfaro.jpeg'
 
 function getBaseYear() {
   const now = new Date()
@@ -22,9 +25,95 @@ function buildOfertaFieldVisibility(plan) {
   }
 }
 
-export default function PlanView({ plan }) {
+export default function PlanView({
+  plan,
+  cazadorMode,
+  cazadorState,
+  onActivarCazador,
+  onAvanzarCuatri,
+  cazadorLoading,
+}) {
   const baseYear = getBaseYear()
   const ofertaFieldVisibility = buildOfertaFieldVisibility(plan)
+
+  if (cazadorMode && cazadorState) {
+    const cuatriActual = plan.cuatrimestres?.[0]
+    const cuatriNumeroActual = cuatriActual
+      ? cuatriActual.numero + (cazadorState.cuatrisResueltos?.length || 0)
+      : null
+
+    return (
+      <div className="space-y-8">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4">
+          <StatCard
+            label="Cuatrimestres restantes"
+            value={plan.totalCuatrimestres}
+            color="green"
+          />
+          <StatCard
+            label="Aprobadas hasta ahora"
+            value={plan.materiasCompletadas}
+            color="emerald"
+          />
+          <StatCard
+            label="Pendientes"
+            value={plan.materiasPendientes}
+            color={plan.materiasPendientes === 0 ? 'emerald' : 'amber'}
+          />
+        </div>
+
+        {plan.materiasPendientes === 0 && (
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 text-center">
+            <p className="text-emerald-400 font-medium text-lg">
+              Terminaste la carrera, cazador de utopias!
+            </p>
+          </div>
+        )}
+
+        <CazadorHistorial
+          cuatrisResueltos={cazadorState.cuatrisResueltos || []}
+          baseYear={baseYear}
+        />
+
+        {cuatriActual && plan.materiasPendientes > 0 && (
+          <CazadorCuatrimestreActivo
+            key={cuatriNumeroActual}
+            cuatrimestre={{
+              ...cuatriActual,
+              numero: cuatriNumeroActual,
+            }}
+            baseYear={baseYear}
+            ofertaFieldVisibility={ofertaFieldVisibility}
+            onAvanzar={onAvanzarCuatri}
+            loading={cazadorLoading}
+          />
+        )}
+
+        {/* Future semesters preview */}
+        {plan.cuatrimestres.length > 1 && (
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">
+              Cuatrimestres futuros (estimados)
+            </h3>
+            <div className="opacity-40 space-y-6">
+              {plan.cuatrimestres.slice(1).map((cuatri) => (
+                <CuatrimestreCard
+                  key={cuatri.numero}
+                  cuatrimestre={{
+                    ...cuatri,
+                    numero: cuatri.numero + (cazadorState.cuatrisResueltos?.length || 0),
+                  }}
+                  baseYear={baseYear}
+                  ofertaFieldVisibility={ofertaFieldVisibility}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -61,6 +150,29 @@ export default function PlanView({ plan }) {
           CUIDADO: Este plan está estimado y es válido solo si no te cagan de ningún lado. Lo más probable es que te caguen. Siempre te cagan.
         </p>
       </div>
+
+      {/* Cazador button */}
+      {plan.materiasPendientes > 0 && onActivarCazador && (
+        <div
+          onClick={onActivarCazador}
+          className="relative overflow-hidden rounded-xl border border-fuchsia-500/30 cursor-pointer group transition-all hover:border-fuchsia-500/60 hover:shadow-lg hover:shadow-fuchsia-500/10"
+        >
+          <div className="absolute inset-0">
+            <img src={cazadorImg} alt="" className="w-full h-full object-cover object-top opacity-20 group-hover:opacity-30 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-950/80 via-neutral-950/70 to-violet-950/80" />
+          </div>
+          <div className="relative px-8 py-6 flex items-center gap-5">
+            <img src={cazadorImg} alt="" className="w-16 h-16 rounded-full object-cover object-top ring-2 ring-fuchsia-500/50 shrink-0" />
+            <div>
+              <p className="text-fuchsia-300 font-semibold text-base">Activar Cazador de Utopias Imposibles</p>
+              <p className="text-neutral-500 text-sm mt-1">
+                Avanzá cuatri por cuatri marcando lo que aprobaste de verdad
+              </p>
+            </div>
+            <span className="ml-auto text-fuchsia-400/60 text-2xl group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </div>
+      )}
 
       {/* Timeline */}
       <div className="space-y-6">

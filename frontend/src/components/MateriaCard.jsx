@@ -14,7 +14,7 @@ function hasDisplayValue(value) {
   return true
 }
 
-export default function MateriaCard({ materia, ofertaFieldVisibility }) {
+export default function MateriaCard({ materia, ofertaFieldVisibility, selectable, selected, onToggle }) {
   const {
     materiaId,
     nombre,
@@ -53,7 +53,15 @@ export default function MateriaCard({ materia, ofertaFieldVisibility }) {
 
   const esDistancia = modalidad && modalidad.toLowerCase().includes('distancia')
 
-  const borderColor = esDistancia
+  const selectableBorder = selectable
+    ? selected ? 'border-emerald-400 ring-2 ring-emerald-400/30' : 'border-red-500/40'
+    : null
+
+  const selectableBg = selectable
+    ? selected ? 'bg-emerald-500/10' : 'bg-red-500/5'
+    : null
+
+  const borderColor = selectableBorder || (esDistancia
     ? 'border-sky-500/40'
     : anual
     ? 'border-amber-500/40'
@@ -61,9 +69,9 @@ export default function MateriaCard({ materia, ofertaFieldVisibility }) {
     ? 'border-violet-500/40'
     : sinOferta
     ? 'border-neutral-700/50'
-    : 'border-emerald-500/40'
+    : 'border-emerald-500/40')
 
-  const bgColor = esDistancia
+  const bgColor = selectableBg || (esDistancia
     ? 'bg-sky-500/5'
     : anual
     ? 'bg-amber-500/5'
@@ -71,13 +79,21 @@ export default function MateriaCard({ materia, ofertaFieldVisibility }) {
     ? 'bg-violet-500/5'
     : sinOferta
     ? 'bg-neutral-900/30'
-    : 'bg-emerald-500/5'
+    : 'bg-emerald-500/5')
 
   return (
-    <div className={`${bgColor} ${borderColor} border rounded-xl p-4 space-y-3 transition-all hover:scale-[1.02]`}>
+    <div
+      className={`${bgColor} ${borderColor} border rounded-xl p-4 space-y-3 transition-all ${selectable ? 'cursor-pointer hover:scale-[1.03]' : 'hover:scale-[1.02]'}`}
+      onClick={selectable ? onToggle : undefined}
+    >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-sm leading-tight text-neutral-200">
+        {selectable && (
+          <div className={`shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center mt-0.5 transition-colors ${selected ? 'bg-emerald-500 border-emerald-500' : 'border-neutral-600 bg-transparent'}`}>
+            {selected && <span className="text-white text-xs font-bold">✓</span>}
+          </div>
+        )}
+        <h3 className="font-semibold text-sm leading-tight text-neutral-200 flex-1">
           {nombre}
         </h3>
         <div className="flex gap-1.5 shrink-0">

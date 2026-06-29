@@ -63,7 +63,7 @@ export default function PlanView({
           />
         </div>
 
-        {plan.materiasPendientes === 0 && (
+        {!cuatriActual && (
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 text-center">
             <p className="text-emerald-400 font-medium text-lg">
               Terminaste la carrera, cazador de utopias!
@@ -76,7 +76,7 @@ export default function PlanView({
           baseYear={baseYear}
         />
 
-        {cuatriActual && plan.materiasPendientes > 0 && (
+        {cuatriActual && (
           <CazadorCuatrimestreActivo
             key={cuatriNumeroActual}
             cuatrimestre={{
@@ -152,7 +152,7 @@ export default function PlanView({
       </div>
 
       {/* Cazador button */}
-      {plan.materiasPendientes > 0 && onActivarCazador && (
+      {plan.cuatrimestres?.length > 0 && onActivarCazador && (
         <div
           onClick={onActivarCazador}
           className="relative overflow-hidden rounded-xl border border-fuchsia-500/30 cursor-pointer group transition-all hover:border-fuchsia-500/60 hover:shadow-lg hover:shadow-fuchsia-500/10"

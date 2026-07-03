@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import HistoriaUpload from './components/HistoriaUpload'
 import PlanView from './components/PlanView'
+import NetworkMap from './components/NetworkMap'
 import cazadorImg from './assets/alfaro.jpeg'
 
 const BASE_URL = import.meta.env.VITE_API_URL || ''
@@ -38,6 +39,7 @@ export default function App() {
   const [cazadorLoading, setCazadorLoading] = useState(false)
   const [resumePrompt, setResumePrompt] = useState(null)
   const [lastGenParams, setLastGenParams] = useState(null)
+  const [viewMode, setViewMode] = useState('plan')
 
   useEffect(() => {
     const saved = loadCazadorState()
@@ -181,6 +183,7 @@ export default function App() {
     setError(null)
     setCazadorMode(false)
     setCazadorState(null)
+    setViewMode('plan')
     clearCazadorState()
   }
 
@@ -258,14 +261,45 @@ export default function App() {
         )}
 
         {plan && (
-          <PlanView
-            plan={plan}
-            cazadorMode={cazadorMode}
-            cazadorState={cazadorState}
-            onActivarCazador={handleActivarCazador}
-            onAvanzarCuatri={handleAvanzarCuatri}
-            cazadorLoading={cazadorLoading}
-          />
+          <>
+            {!cazadorMode && (
+              <div className="flex items-center gap-1 p-1 bg-neutral-900/50 border border-neutral-800 rounded-xl mb-8 w-fit mx-auto">
+                <button
+                  onClick={() => setViewMode('plan')}
+                  className={`px-5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                    viewMode === 'plan'
+                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50'
+                  }`}
+                >
+                  Timeline
+                </button>
+                <button
+                  onClick={() => setViewMode('network')}
+                  className={`px-5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                    viewMode === 'network'
+                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50'
+                  }`}
+                >
+                  Red de materias
+                </button>
+              </div>
+            )}
+
+            {viewMode === 'plan' || cazadorMode ? (
+              <PlanView
+                plan={plan}
+                cazadorMode={cazadorMode}
+                cazadorState={cazadorState}
+                onActivarCazador={handleActivarCazador}
+                onAvanzarCuatri={handleAvanzarCuatri}
+                cazadorLoading={cazadorLoading}
+              />
+            ) : (
+              <NetworkMap historia={lastGenParams?.historia || []} />
+            )}
+          </>
         )}
       </main>
     </div>

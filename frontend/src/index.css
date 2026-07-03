@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+.network-map-flow .react-flow__edge-path {
+  transition: stroke 0.3s, stroke-width 0.3s, opacity 0.3s;
+}
+
+.network-map-flow .react-flow__node {
+  transition: filter 0.3s;
+}
+
+.network-map-flow .react-flow__controls button {
+  width: 28px;
+  height: 28px;
+}
+
+.network-map-flow .react-flow__controls button svg {
+  fill: #a3a3a3;
+}
+
+.network-map-flow .react-flow__minimap {
+  border-radius: 8px;
+}

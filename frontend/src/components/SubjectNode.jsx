@@ -110,8 +110,10 @@ function SubjectNode({ data }) {
           {canSimulate ? (
             <button
               onClick={handleToggle}
+              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
               title={status === 'simulated' ? 'Quitar simulación' : 'Marcar como cursada (provisorio)'}
-              className={`${config.iconBg} shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5 cursor-pointer hover:scale-110 transition-transform`}
+              className={`nodrag nopan ${config.iconBg} shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5 cursor-pointer hover:scale-110 transition-transform`}
             >
               <span className="text-white text-xs font-bold">{status === 'simulated' ? '✓' : config.icon}</span>
             </button>

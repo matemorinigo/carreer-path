@@ -4,6 +4,7 @@ import planEstudios from '../data/planEstudios.json'
 const statusLabels = {
   completed: { text: 'Aprobada', color: 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30' },
   available: { text: 'Disponible', color: 'text-cyan-400 bg-cyan-500/20 border-cyan-500/30' },
+  simulated: { text: 'Simulada (provisorio)', color: 'text-amber-400 bg-amber-500/20 border-amber-500/30' },
   locked: { text: 'Bloqueada', color: 'text-neutral-400 bg-neutral-700/30 border-neutral-600/30' },
 }
 
@@ -59,6 +60,21 @@ export default function SubjectDetailPanel({ nodeData, completionSet, onClose, o
                   </span>
                 )}
               </div>
+
+              {(nodeData.status === 'available' || nodeData.status === 'simulated') && (
+                <button
+                  onClick={() => nodeData.onToggleSimulate?.(nodeData.subject.id)}
+                  className={`w-full text-sm px-3 py-2.5 rounded-lg border transition-colors cursor-pointer ${
+                    nodeData.status === 'simulated'
+                      ? 'border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20'
+                      : 'border-neutral-700 text-neutral-300 bg-neutral-800/50 hover:bg-neutral-700'
+                  }`}
+                >
+                  {nodeData.status === 'simulated'
+                    ? 'Quitar simulación'
+                    : 'Marcar como cursada (provisorio)'}
+                </button>
+              )}
 
               {nodeData.status === 'completed' && (
                 <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 space-y-2">

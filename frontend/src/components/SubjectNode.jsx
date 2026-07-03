@@ -19,6 +19,14 @@ const statusConfig = {
     icon: '→',
     iconBg: 'bg-cyan-500',
   },
+  simulated: {
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-400/60 border-dashed',
+    text: 'text-amber-300',
+    shadow: 'shadow-amber-500/15',
+    icon: '?',
+    iconBg: 'bg-amber-500',
+  },
   locked: {
     bg: 'bg-neutral-900/60',
     border: 'border-neutral-700/40',
@@ -30,12 +38,18 @@ const statusConfig = {
 }
 
 function SubjectNode({ data }) {
-  const { subject, status, nota, depth, isTransversal, completedChild } = data
+  const { subject, status, nota, depth, isTransversal, completedChild, onToggleSimulate } = data
   const config = statusConfig[status]
   const delay = (depth || 0) * 0.12 + Math.random() * 0.05
 
   const displayName = completedChild ? completedChild.nombre : subject.nombre
   const displayNota = completedChild ? completedChild.nota : nota
+  const canSimulate = status === 'available' || status === 'simulated'
+
+  const handleToggle = (e) => {
+    e.stopPropagation()
+    onToggleSimulate?.(subject.id)
+  }
 
   return (
     <motion.div
@@ -67,6 +81,17 @@ function SubjectNode({ data }) {
           />
         )}
 
+        {status === 'simulated' && (
+          <motion.div
+            className="absolute inset-0 rounded-xl border-2 border-amber-400/40"
+            animate={{
+              opacity: [0.3, 0.8, 0.3],
+              scale: [1, 1.02, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+
         {status === 'completed' && (
           <motion.div
             className="absolute inset-0 rounded-xl"
@@ -82,9 +107,19 @@ function SubjectNode({ data }) {
         )}
 
         <div className="relative flex items-start gap-2.5">
-          <div className={`${config.iconBg} shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5`}>
-            <span className="text-white text-xs font-bold">{config.icon}</span>
-          </div>
+          {canSimulate ? (
+            <button
+              onClick={handleToggle}
+              title={status === 'simulated' ? 'Quitar simulación' : 'Marcar como cursada (provisorio)'}
+              className={`${config.iconBg} shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5 cursor-pointer hover:scale-110 transition-transform`}
+            >
+              <span className="text-white text-xs font-bold">{status === 'simulated' ? '✓' : config.icon}</span>
+            </button>
+          ) : (
+            <div className={`${config.iconBg} shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5`}>
+              <span className="text-white text-xs font-bold">{config.icon}</span>
+            </div>
+          )}
 
           <div className="flex-1 min-w-0">
             <p className={`text-xs font-semibold leading-tight ${config.text} line-clamp-2`}>
@@ -103,6 +138,11 @@ function SubjectNode({ data }) {
               {!subject.esObligatoria && (
                 <span className="text-[9px] px-1 py-0.5 rounded bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30">
                   Electiva
+                </span>
+              )}
+              {status === 'simulated' && (
+                <span className="text-[9px] px-1 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Provisorio
                 </span>
               )}
             </div>

@@ -15,11 +15,32 @@ function buildCompletionMap(historia) {
   return map
 }
 
-function computeStatus(subject, completionSet) {
+function computeStatus(subject, completionSet, simulatedSet) {
   if (completionSet.has(subject.id)) return 'completed'
+  if (simulatedSet.has(subject.id)) return 'simulated'
+  const effectiveSet = simulatedSet.size === 0
+    ? completionSet
+    : new Set([...completionSet, ...simulatedSet])
   if (subject.correlativas.length === 0) return 'available'
-  const allPrereqsMet = subject.correlativas.every(id => completionSet.has(id))
+  const allPrereqsMet = subject.correlativas.every(id => effectiveSet.has(id))
   return allPrereqsMet ? 'available' : 'locked'
+}
+
+function edgeStyle(sourceStatus, targetStatus) {
+  const sourceDone = sourceStatus === 'completed' || sourceStatus === 'simulated'
+  const targetUnlocked = targetStatus === 'available' || targetStatus === 'simulated' || targetStatus === 'completed'
+  const involvesSimulated = sourceStatus === 'simulated' || targetStatus === 'simulated'
+
+  if (!sourceDone || !targetUnlocked) {
+    return { stroke: '#404040', strokeWidth: 1.5, opacity: 0.3, animated: false }
+  }
+  if (sourceStatus === 'completed' && targetStatus === 'completed') {
+    return { stroke: '#34d399', strokeWidth: 2.5, opacity: 0.8, animated: false }
+  }
+  if (involvesSimulated) {
+    return { stroke: '#fbbf24', strokeWidth: 2.5, opacity: 0.9, animated: true }
+  }
+  return { stroke: '#22d3ee', strokeWidth: 2.5, opacity: 0.9, animated: true }
 }
 
 function computeDepthMap(subjects) {
@@ -43,10 +64,11 @@ function computeDepthMap(subjects) {
   return depths
 }
 
-export default function useGraphLayout(historia) {
+export default function useGraphLayout(historia, simulatedIds) {
   return useMemo(() => {
     const completionMap = buildCompletionMap(historia || [])
     const completionSet = new Set(completionMap.keys())
+    const simulatedSet = new Set(simulatedIds || [])
 
     const mainSubjects = planEstudios.filter(s => !s.padreId)
     const childSubjects = planEstudios.filter(s => s.padreId)
@@ -79,7 +101,7 @@ export default function useGraphLayout(historia) {
 
     core.forEach(s => {
       const pos = g.node(s.id)
-      const status = computeStatus(s, completionSet)
+      const status = computeStatus(s, completionSet, simulatedSet)
       const histEntry = completionMap.get(s.id)
       const depth = depthMap.get(s.id) || 0
 
@@ -109,26 +131,18 @@ export default function useGraphLayout(historia) {
         if (g.hasNode(prereqId)) {
           const sourceStatus = computeStatus(
             planEstudios.find(p => p.id === prereqId),
-            completionSet
+            completionSet,
+            simulatedSet
           )
-          const isCompletedPath = sourceStatus === 'completed' && status === 'completed'
-          const isAvailablePath = sourceStatus === 'completed' && status === 'available'
+          const { animated, ...style } = edgeStyle(sourceStatus, status)
 
           edges.push({
             id: `${prereqId}-${s.id}`,
             source: prereqId,
             target: s.id,
             type: 'smoothstep',
-            animated: isAvailablePath,
-            style: {
-              stroke: isCompletedPath
-                ? '#34d399'
-                : isAvailablePath
-                ? '#22d3ee'
-                : '#404040',
-              strokeWidth: isCompletedPath || isAvailablePath ? 2.5 : 1.5,
-              opacity: isCompletedPath ? 0.8 : isAvailablePath ? 0.9 : 0.3,
-            },
+            animated,
+            style,
           })
         }
       })
@@ -138,7 +152,7 @@ export default function useGraphLayout(historia) {
     let transY = 0
 
     transversal.forEach(s => {
-      const status = computeStatus(s, completionSet)
+      const status = computeStatus(s, completionSet, simulatedSet)
       const histEntry = completionMap.get(s.id)
       const depth = depthMap.get(s.id) || 0
 
@@ -160,21 +174,16 @@ export default function useGraphLayout(historia) {
       s.correlativas.forEach(prereqId => {
         const prereqSubj = planEstudios.find(p => p.id === prereqId)
         if (!prereqSubj) return
-        const sourceStatus = computeStatus(prereqSubj, completionSet)
-        const isCompletedPath = sourceStatus === 'completed' && status === 'completed'
-        const isAvailablePath = sourceStatus === 'completed' && status === 'available'
+        const sourceStatus = computeStatus(prereqSubj, completionSet, simulatedSet)
+        const { animated, ...style } = edgeStyle(sourceStatus, status)
 
         edges.push({
           id: `${prereqId}-${s.id}`,
           source: prereqId,
           target: s.id,
           type: 'smoothstep',
-          animated: isAvailablePath,
-          style: {
-            stroke: isCompletedPath ? '#34d399' : isAvailablePath ? '#22d3ee' : '#404040',
-            strokeWidth: isCompletedPath || isAvailablePath ? 2.5 : 1.5,
-            opacity: isCompletedPath ? 0.8 : isAvailablePath ? 0.9 : 0.3,
-          },
+          animated,
+          style,
         })
       })
 
@@ -182,5 +191,5 @@ export default function useGraphLayout(historia) {
     })
 
     return { nodes, edges, planEstudios: mainSubjects }
-  }, [historia])
+  }, [historia, simulatedIds])
 }

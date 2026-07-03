@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import {
   ReactFlow,
   MiniMap,
@@ -18,11 +18,35 @@ import useGraphLayout from '../hooks/useGraphLayout'
 const nodeTypes = { subject: SubjectNode }
 
 function NetworkMapInner({ historia }) {
-  const { nodes: layoutNodes, edges: layoutEdges } = useGraphLayout(historia)
-  const [nodes, , onNodesChange] = useNodesState(layoutNodes)
-  const [edges, , onEdgesChange] = useEdgesState(layoutEdges)
+  const [simulatedIds, setSimulatedIds] = useState(() => new Set())
+  const { nodes: layoutNodes, edges: layoutEdges } = useGraphLayout(historia, simulatedIds)
   const [selectedNode, setSelectedNode] = useState(null)
   const { setCenter } = useReactFlow()
+
+  const toggleSimulate = useCallback((subjectId) => {
+    setSimulatedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(subjectId)) next.delete(subjectId)
+      else next.add(subjectId)
+      return next
+    })
+  }, [])
+
+  const nodesWithHandlers = useMemo(
+    () => layoutNodes.map(n => ({ ...n, data: { ...n.data, onToggleSimulate: toggleSimulate } })),
+    [layoutNodes, toggleSimulate]
+  )
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(nodesWithHandlers)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutEdges)
+
+  useEffect(() => {
+    setNodes(nodesWithHandlers)
+  }, [nodesWithHandlers, setNodes])
+
+  useEffect(() => {
+    setEdges(layoutEdges)
+  }, [layoutEdges, setEdges])
 
   const completionSet = useMemo(() => {
     const set = new Set()
@@ -56,17 +80,28 @@ function NetworkMapInner({ historia }) {
     return nodes.filter(n => n.data.status === 'locked').length
   }, [nodes])
 
+  const statsSimulated = simulatedIds.size
+
   return (
     <div className="space-y-4">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-wrap gap-3"
+        className="flex flex-wrap items-center gap-3"
       >
         <StatPill label="Aprobadas" value={statsCompleted} color="emerald" />
         <StatPill label="Disponibles" value={statsAvailable} color="cyan" />
+        {statsSimulated > 0 && <StatPill label="Simuladas" value={statsSimulated} color="amber" />}
         <StatPill label="Bloqueadas" value={statsLocked} color="neutral" />
         <StatPill label="Total" value={nodes.length} color="white" />
+        {statsSimulated > 0 && (
+          <button
+            onClick={() => setSimulatedIds(new Set())}
+            className="ml-auto text-xs px-3 py-1.5 rounded-lg border border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 transition-colors cursor-pointer"
+          >
+            Limpiar simulación
+          </button>
+        )}
       </motion.div>
 
       <motion.div
@@ -98,6 +133,7 @@ function NetworkMapInner({ historia }) {
             className="!bg-neutral-900/90 !border-neutral-700 !rounded-lg"
             nodeColor={(node) => {
               if (node.data?.status === 'completed') return '#34d399'
+              if (node.data?.status === 'simulated') return '#fbbf24'
               if (node.data?.status === 'available') return '#22d3ee'
               return '#404040'
             }}
@@ -113,6 +149,10 @@ function NetworkMapInner({ historia }) {
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
             Disponible
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            Simulada (provisorio)
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-neutral-600" />
@@ -135,6 +175,7 @@ function StatPill({ label, value, color }) {
   const colors = {
     emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
     cyan: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
+    amber: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
     neutral: 'text-neutral-400 bg-neutral-800/50 border-neutral-700/40',
     white: 'text-white bg-neutral-800/50 border-neutral-700/40',
   }

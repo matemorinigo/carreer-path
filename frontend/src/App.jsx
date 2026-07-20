@@ -10,7 +10,7 @@ const CAZADOR_STORAGE_KEY = 'cazador-utopias-state'
 
 function getCuatrimestreActual() {
   const month = new Date().getMonth()
-  return month >= 7 ? 2 : 1
+  return month >= 6 ? 2 : 1
 }
 
 function loadCazadorState() {

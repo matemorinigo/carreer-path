@@ -6,7 +6,7 @@ import cazadorImg from '../assets/alfaro.jpeg'
 function getBaseYear() {
   const now = new Date()
   const month = now.getMonth()
-  return month >= 7 ? now.getFullYear() + 1 : now.getFullYear()
+  return month >= 6 ? now.getFullYear() + 1 : now.getFullYear()
 }
 
 function hasValue(value) {

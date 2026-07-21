@@ -17,11 +17,12 @@ function earliestDay(materia) {
   )
 }
 
-export default function CuatrimestreCard({ cuatrimestre, baseYear, ofertaFieldVisibility }) {
+export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreInicio = 1, ofertaFieldVisibility }) {
   const { numero, materias } = cuatrimestre
   const startYear = baseYear || new Date().getFullYear()
-  const actualYear = startYear + Math.floor((numero - 1) / 2)
-  const half = numero % 2 === 1 ? 1 : 2
+  const cuatrimestreReal = cuatrimestreInicio + numero - 1
+  const actualYear = startYear + Math.floor((cuatrimestreReal - 1) / 2)
+  const half = cuatrimestreReal % 2 === 1 ? 1 : 2
   const label = CUATRI_LABELS[half] || `Cuatrimestre ${half}`
 
   const sorted = [...materias].sort((a, b) => earliestDay(a) - earliestDay(b))

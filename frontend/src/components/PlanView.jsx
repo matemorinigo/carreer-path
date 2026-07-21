@@ -4,9 +4,7 @@ import CazadorHistorial from './CazadorHistorial'
 import cazadorImg from '../assets/alfaro.jpeg'
 
 function getBaseYear() {
-  const now = new Date()
-  const month = now.getMonth()
-  return month >= 6 ? now.getFullYear() + 1 : now.getFullYear()
+  return new Date().getFullYear()
 }
 
 function hasValue(value) {
@@ -78,6 +76,7 @@ export default function PlanView({
         <CazadorHistorial
           cuatrisResueltos={cazadorState.cuatrisResueltos || []}
           baseYear={baseYear}
+          cuatrimestreInicio={cazadorState.cuatrimestreInicio}
         />
 
         {cuatriActual && (
@@ -88,6 +87,7 @@ export default function PlanView({
               numero: cuatriNumeroActual,
             }}
             baseYear={baseYear}
+            cuatrimestreInicio={cazadorState.cuatrimestreInicio}
             ofertaFieldVisibility={ofertaFieldVisibility}
             onAvanzar={onAvanzarCuatri}
             loading={cazadorLoading}
@@ -109,6 +109,7 @@ export default function PlanView({
                     numero: cuatri.numero + (cazadorState.cuatrisResueltos?.length || 0),
                   }}
                   baseYear={baseYear}
+                  cuatrimestreInicio={cazadorState.cuatrimestreInicio}
                   ofertaFieldVisibility={ofertaFieldVisibility}
                 />
               ))}

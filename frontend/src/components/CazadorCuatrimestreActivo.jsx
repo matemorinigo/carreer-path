@@ -19,7 +19,7 @@ function esContinuacionAnual(materia) {
   return materia.anual && materia.sinOferta
 }
 
-export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, ofertaFieldVisibility, onAvanzar, loading }) {
+export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, cuatrimestreInicio = 1, ofertaFieldVisibility, onAvanzar, loading }) {
   const { numero, materias } = cuatrimestre
 
   const materiasSeleccionables = materias.filter(m => !esContinuacionAnual(m))
@@ -27,8 +27,9 @@ export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, ofer
 
   const [aprobadas, setAprobadas] = useState(new Set(materiasSeleccionables.map(m => m.materiaId)))
 
-  const actualYear = baseYear + Math.floor((numero - 1) / 2)
-  const half = numero % 2 === 1 ? 1 : 2
+  const cuatrimestreReal = cuatrimestreInicio + numero - 1
+  const actualYear = baseYear + Math.floor((cuatrimestreReal - 1) / 2)
+  const half = cuatrimestreReal % 2 === 1 ? 1 : 2
   const label = CUATRI_LABELS[half] || `Cuatrimestre ${half}`
   const sorted = [...materiasSeleccionables].sort((a, b) => earliestDay(a) - earliestDay(b))
 

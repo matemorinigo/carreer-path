@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const CUATRI_LABELS = { 1: '1er cuatrimestre', 2: '2do cuatrimestre' }
 
-export default function CazadorHistorial({ cuatrisResueltos, baseYear }) {
+export default function CazadorHistorial({ cuatrisResueltos, baseYear, cuatrimestreInicio = 1 }) {
   const [expandido, setExpandido] = useState(null)
 
   if (!cuatrisResueltos.length) return null
@@ -13,8 +13,9 @@ export default function CazadorHistorial({ cuatrisResueltos, baseYear }) {
         Cuatrimestres anteriores
       </h3>
       {cuatrisResueltos.map((cuatri, idx) => {
-        const actualYear = baseYear + Math.floor((cuatri.numero - 1) / 2)
-        const half = cuatri.numero % 2 === 1 ? 1 : 2
+        const cuatrimestreReal = cuatrimestreInicio + cuatri.numero - 1
+        const actualYear = baseYear + Math.floor((cuatrimestreReal - 1) / 2)
+        const half = cuatrimestreReal % 2 === 1 ? 1 : 2
         const label = CUATRI_LABELS[half]
         const aprobadas = cuatri.materias.filter(m => m.aprobada).length
         const total = cuatri.materias.length

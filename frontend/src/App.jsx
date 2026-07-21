@@ -3,15 +3,11 @@ import HistoriaUpload from './components/HistoriaUpload'
 import PlanView from './components/PlanView'
 import NetworkMap from './components/NetworkMap'
 import cazadorImg from './assets/alfaro.jpeg'
+import { getCuatrimestreInicioActual } from './utils/cuatrimestre'
 
 const BASE_URL = import.meta.env.VITE_API_URL || ''
 const API_URL = `${BASE_URL}/api/planificador/generar`
 const CAZADOR_STORAGE_KEY = 'cazador-utopias-state'
-
-function getCuatrimestreActual() {
-  const month = new Date().getMonth()
-  return month >= 6 ? 2 : 1
-}
 
 function loadCazadorState() {
   try {
@@ -93,7 +89,7 @@ export default function App() {
       maxMaterias: lastGenParams?.maxMaterias || 5,
       turnos: lastGenParams?.turnos || ['manana', 'tarde', 'noche'],
       ofertaCustom: lastGenParams?.ofertaCustom || null,
-      cuatrimestreInicio: getCuatrimestreActual(),
+      cuatrimestreInicio: getCuatrimestreInicioActual(),
     }
     setCazadorMode(true)
     setCazadorState(state)

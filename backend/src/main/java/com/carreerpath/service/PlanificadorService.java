@@ -26,6 +26,10 @@ public class PlanificadorService {
 
     private static final int MAX_CUATRIMESTRES = 30;
 
+    // Desde 2026 cualquier materia electiva ofertada cubre indistintamente
+    // Electiva I, II o III: son un pool compartido, no listas separadas.
+    private static final Set<String> ELECTIVA_SLOTS_COMPARTIDOS = Set.of("3672", "3673", "3674");
+
     private static final Map<String, LocalTime[]> TURNOS = Map.of(
         "manana", new LocalTime[]{LocalTime.of(8, 0), LocalTime.of(13, 0)},
         "tarde",  new LocalTime[]{LocalTime.of(13, 0), LocalTime.of(18, 0)},
@@ -97,6 +101,7 @@ public class PlanificadorService {
             List<MateriaAsignadaDTO> asignadas = new ArrayList<>();
             List<Horario> horariosOcupados = new ArrayList<>();
             Set<String> slotsResueltos = new HashSet<>();
+            Set<String> electivasElegidasEsteCuatrimestre = new HashSet<>();
 
             Set<String> anualesCompletandose = new HashSet<>();
             if (!esPrimerCuatrimestreDelAnio && !materiasAnualesEnCurso.isEmpty()) {
@@ -187,11 +192,13 @@ public class PlanificadorService {
                 if (tieneHijas(materia, materiaMap)) {
                     MateriaAsignadaDTO electiva = resolverElectiva(
                         materia, materiaMap, comisionesPorMateria,
-                        horariosOcupados, completadas, primerCuatrimestre, turnos);
+                        horariosOcupados, completadas, electivasElegidasEsteCuatrimestre,
+                        primerCuatrimestre, turnos);
                     if (electiva != null) {
                         asignadas.add(electiva);
                         agregarHorariosOcupados(electiva, comisionesPorMateria, horariosOcupados);
                         slotsResueltos.add(materiaId);
+                        electivasElegidasEsteCuatrimestre.add(electiva.getMateriaId());
                         if (!materia.isEsTransversal()) coresAsignados++;
                     }
                     continue;
@@ -444,15 +451,25 @@ public class PlanificadorService {
             Map<String, List<Comision>> comisionesPorMateria,
             List<Horario> horariosOcupados,
             Set<String> completadas,
+            Set<String> yaElegidasEsteCuatrimestre,
             boolean conOferta,
             List<String> turnos) {
 
+        // Si el slot pertenece al pool compartido de electivas, cualquier opción de
+        // cualquiera de los 3 slots es válida acá (evitando repetir una ya asignada
+        // a otro slot en este mismo cuatrimestre).
+        Set<String> gruposEquivalentes = ELECTIVA_SLOTS_COMPARTIDOS.contains(electivaSlot.getId())
+            ? ELECTIVA_SLOTS_COMPARTIDOS
+            : Set.of(electivaSlot.getId());
+
         List<Materia> opciones = materiaMap.values().stream()
             .filter(m -> m.getMateriaPadre() != null
-                && m.getMateriaPadre().getId().equals(electivaSlot.getId()))
+                && gruposEquivalentes.contains(m.getMateriaPadre().getId()))
             .filter(m -> !completadas.contains(m.getId()))
+            .filter(m -> !yaElegidasEsteCuatrimestre.contains(m.getId()))
             .filter(m -> m.getCorrelativas().stream()
                 .allMatch(c -> completadas.contains(c.getId())))
+            .sorted(Comparator.comparing(Materia::getId))
             .collect(Collectors.toList());
 
         if (opciones.isEmpty()) {

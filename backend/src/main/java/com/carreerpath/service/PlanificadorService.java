@@ -153,6 +153,11 @@ public class PlanificadorService {
                 .sorted(porPeso)
                 .collect(Collectors.toList());
 
+            // Las electivas (con varias opciones de horario) se resuelven últimas entre
+            // los cores: así las materias de franja fija reservan su día primero, y la
+            // electiva -flexible- se acomoda en lo que quede libre en vez de tomárselo.
+            coresCursables.sort(Comparator.comparing(id -> tieneHijas(materiaMap.get(id), materiaMap)));
+
             List<String> transvCursables = cursables.stream()
                 .filter(id -> materiaMap.get(id).isEsTransversal())
                 .sorted(porPeso)

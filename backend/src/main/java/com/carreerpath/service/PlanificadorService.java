@@ -153,16 +153,16 @@ public class PlanificadorService {
                 .sorted(porPeso)
                 .collect(Collectors.toList());
 
-            // Mechar: detectar si la transversal tiene comisión a distancia
-            boolean transvADistancia = false;
+            // Mechar: detectar si la transversal tiene comisión sin horario fijo (asincrónica)
+            boolean transvSinHorarioFijo = false;
             if (!transvCursables.isEmpty()) {
                 String firstTransv = transvCursables.get(0);
                 List<Comision> comisTransv = comisionesPorMateria.getOrDefault(firstTransv, List.of());
-                transvADistancia = comisTransv.stream().anyMatch(c -> esADistancia(c.getModalidad()));
+                transvSinHorarioFijo = comisTransv.stream().anyMatch(this::sinHorarioFijo);
             }
 
-            // A distancia: no reservar slot (será bonus). Presencial: reservar 1 slot (mechado normal).
-            int slotsTransv = transvADistancia ? 0 : Math.min(1, transvCursables.size());
+            // Sin horario fijo: no reservar slot (será bonus). Con horario: reservar 1 slot (mechado normal).
+            int slotsTransv = transvSinHorarioFijo ? 0 : Math.min(1, transvCursables.size());
             int limiteCores = modoOptimo ? Integer.MAX_VALUE : maxMateriasPorCuatrimestre - slotsTransv;
 
             List<String> ordenAsignacion = new ArrayList<>(coresCursables);
@@ -174,10 +174,10 @@ public class PlanificadorService {
             int coresAsignados = 0;
             for (String materiaId : ordenAsignacion) {
                 Materia materia = materiaMap.get(materiaId);
-                boolean esBonusDistancia = materia.isEsTransversal() && transvADistancia;
+                boolean esBonusSinHorario = materia.isEsTransversal() && transvSinHorarioFijo;
 
-                // Bonus a distancia no cuenta contra el límite
-                if (!modoOptimo && !esBonusDistancia && asignadas.size() >= maxMateriasPorCuatrimestre) continue;
+                // Bonus sin horario fijo no cuenta contra el límite
+                if (!modoOptimo && !esBonusSinHorario && asignadas.size() >= maxMateriasPorCuatrimestre) continue;
 
                 // Limitar cores para dejar lugar a transversales presenciales
                 if (!materia.isEsTransversal() && !modoOptimo && coresAsignados >= limiteCores) continue;
@@ -190,9 +190,7 @@ public class PlanificadorService {
                         horariosOcupados, completadas, primerCuatrimestre, turnos);
                     if (electiva != null) {
                         asignadas.add(electiva);
-                        if (!esADistancia(electiva.getModalidad())) {
-                            agregarHorariosOcupados(electiva, comisionesPorMateria, horariosOcupados);
-                        }
+                        agregarHorariosOcupados(electiva, comisionesPorMateria, horariosOcupados);
                         slotsResueltos.add(materiaId);
                         if (!materia.isEsTransversal()) coresAsignados++;
                     }
@@ -205,7 +203,7 @@ public class PlanificadorService {
                     Comision elegida = comisiones.stream()
                         .sorted((a, b) -> Boolean.compare(esADistancia(b.getModalidad()), esADistancia(a.getModalidad())))
                         .filter(c -> comisionPermitidaPorTurno(c, turnos))
-                        .filter(c -> esADistancia(c.getModalidad()) || !hayConflictoHorario(c.getHorarios(), horariosOcupados))
+                        .filter(c -> !hayConflictoHorario(c.getHorarios(), horariosOcupados))
                         .findFirst()
                         .orElse(null);
 
@@ -216,9 +214,7 @@ public class PlanificadorService {
                         String prevConflicto = conflictosPendientes.remove(materiaId);
                         if (prevConflicto != null) dto.setConflictoCon(prevConflicto);
                         asignadas.add(dto);
-                        if (!esADistancia(elegida.getModalidad())) {
-                            horariosOcupados.addAll(elegida.getHorarios());
-                        }
+                        horariosOcupados.addAll(elegida.getHorarios());
                     } else if (materia.isAnual()) {
                         MateriaAsignadaDTO dto = MateriaAsignadaDTO.builder()
                             .materiaId(materia.getId())
@@ -384,7 +380,7 @@ public class PlanificadorService {
     }
 
     private boolean comisionPermitidaPorTurno(Comision comision, List<String> turnos) {
-        if (esADistancia(comision.getModalidad())) return true;
+        if (sinHorarioFijo(comision)) return true;
         if (turnos.size() == 3) return true;
 
         for (Horario h : comision.getHorarios()) {
@@ -415,6 +411,14 @@ public class PlanificadorService {
     private boolean esHorarioADistancia(Horario h) {
         if (h.getDia() == null) return false;
         return h.getDia().toLowerCase().contains("distancia");
+    }
+
+    // Sin horario fijo = asincrónica, sin día/hora real que pueda chocar con otra materia.
+    // No confundir con modalidad "a distancia": una comisión remota puede tener horario fijo
+    // (ej. video-clase sincrónica) y en ese caso sí debe chequearse contra otros horarios.
+    private boolean sinHorarioFijo(Comision comision) {
+        List<Horario> horarios = comision.getHorarios();
+        return horarios.isEmpty() || horarios.stream().allMatch(this::esHorarioADistancia);
     }
 
     // ── Resolución de Electivas ──
@@ -468,10 +472,9 @@ public class PlanificadorService {
                     .collect(Collectors.toList());
                 for (Comision comision : ordenadas) {
                     if (!comisionPermitidaPorTurno(comision, turnos)) continue;
-                    boolean sinConflicto = esADistancia(comision.getModalidad())
-                        || !hayConflictoHorario(comision.getHorarios(), horariosOcupados);
+                    boolean sinConflicto = !hayConflictoHorario(comision.getHorarios(), horariosOcupados);
                     if (sinConflicto) {
-                        if (esADistancia(comision.getModalidad())) {
+                        if (sinHorarioFijo(comision)) {
                             mejor = buildMateriaAsignada(opcion, comision);
                             if (!conOferta) mejor.setEstimado(true);
                             return mejor;

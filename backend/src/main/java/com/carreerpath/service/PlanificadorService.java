@@ -295,10 +295,30 @@ public class PlanificadorService {
             for (String slotId : slotsResueltos) {
                 completadas.add(slotId);
                 pendientes.remove(slotId);
+
+                // Los slots del pool compartido de electivas NO completan a sus
+                // hermanas nominales acá: otra candidata sin usar puede hacer
+                // falta todavía para resolver otro de los 3 slots.
+                if (!ELECTIVA_SLOTS_COMPARTIDOS.contains(slotId)) {
+                    materiaMap.values().stream()
+                        .filter(m -> m.getMateriaPadre() != null
+                            && m.getMateriaPadre().getId().equals(slotId))
+                        .map(Materia::getId)
+                        .forEach(childId -> {
+                            pendientes.remove(childId);
+                            completadas.add(childId);
+                        });
+                }
+            }
+
+            // Una vez resueltos los 3 slots del pool compartido, la candidata que
+            // haya quedado sin usar ya no hace falta (sólo se piden 3 electivas).
+            if (completadas.containsAll(ELECTIVA_SLOTS_COMPARTIDOS)) {
                 materiaMap.values().stream()
                     .filter(m -> m.getMateriaPadre() != null
-                        && m.getMateriaPadre().getId().equals(slotId))
+                        && ELECTIVA_SLOTS_COMPARTIDOS.contains(m.getMateriaPadre().getId()))
                     .map(Materia::getId)
+                    .filter(pendientes::contains)
                     .forEach(childId -> {
                         pendientes.remove(childId);
                         completadas.add(childId);

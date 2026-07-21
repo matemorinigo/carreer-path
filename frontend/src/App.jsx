@@ -70,9 +70,10 @@ export default function App() {
     setPlan(null)
 
     try {
-      const data = await fetchPlan(historia, maxMaterias, turnos, ofertaCustom)
+      const cuatrimestreInicio = getCuatrimestreInicioActual()
+      const data = await fetchPlan(historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio)
       setPlan(data)
-      setLastGenParams({ historia, maxMaterias, turnos, ofertaCustom })
+      setLastGenParams({ historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio })
       setCazadorMode(false)
       setCazadorState(null)
     } catch (err) {
@@ -288,6 +289,7 @@ export default function App() {
                 plan={plan}
                 cazadorMode={cazadorMode}
                 cazadorState={cazadorState}
+                cuatrimestreInicio={lastGenParams?.cuatrimestreInicio}
                 onActivarCazador={handleActivarCazador}
                 onAvanzarCuatri={handleAvanzarCuatri}
                 cazadorLoading={cazadorLoading}

@@ -27,6 +27,7 @@ export default function PlanView({
   plan,
   cazadorMode,
   cazadorState,
+  cuatrimestreInicio,
   onActivarCazador,
   onAvanzarCuatri,
   cazadorLoading,
@@ -186,6 +187,7 @@ export default function PlanView({
             key={cuatri.numero}
             cuatrimestre={cuatri}
             baseYear={baseYear}
+            cuatrimestreInicio={cuatrimestreInicio}
             ofertaFieldVisibility={ofertaFieldVisibility}
           />
         ))}

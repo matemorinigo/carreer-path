@@ -17,7 +17,7 @@ function earliestDay(materia) {
   )
 }
 
-export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreInicio = 1, ofertaFieldVisibility }) {
+export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreInicio = 1, ofertaFieldVisibility, onIntercambiar }) {
   const { numero, materias } = cuatrimestre
   const startYear = baseYear || new Date().getFullYear()
   const cuatrimestreReal = cuatrimestreInicio + numero - 1
@@ -52,6 +52,9 @@ export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreI
               key={materia.materiaId}
               materia={materia}
               ofertaFieldVisibility={ofertaFieldVisibility}
+              onIntercambiar={onIntercambiar}
+              cuatrimestreInicio={cuatrimestreInicio}
+              baseYear={baseYear}
             />
           ))}
         </div>

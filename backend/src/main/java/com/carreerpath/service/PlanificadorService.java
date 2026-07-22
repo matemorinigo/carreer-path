@@ -93,6 +93,9 @@ public class PlanificadorService {
         boolean primerCuatrimestre = true;
         Set<String> materiasAnualesEnCurso = new HashSet<>();
         Map<String, String> conflictosPendientes = new HashMap<>();
+        // Materias diferidas por choque de horario que, por no bloquear nada a futuro,
+        // se pueden intercambiar con la que ganó el slot. Clave: id de la diferida.
+        Map<String, SwapPendiente> swapsPendientes = new HashMap<>();
 
         while ((!pendientes.isEmpty() || !materiasAnualesEnCurso.isEmpty()) && numCuatrimestre <= MAX_CUATRIMESTRES) {
             int cuatrimestreReal = cuatrimestreInicio + numCuatrimestre - 1;
@@ -225,6 +228,21 @@ public class PlanificadorService {
                         dto.setEstimado(!primerCuatrimestre);
                         String prevConflicto = conflictosPendientes.remove(materiaId);
                         if (prevConflicto != null) dto.setConflictoCon(prevConflicto);
+
+                        // Si esta materia venía diferida por un choque con otra que
+                        // tampoco bloquea nada, y la ganadora entra igual acá sin esta
+                        // (chequeo del lado de este cuatrimestre), quedan intercambiables.
+                        SwapPendiente swap = swapsPendientes.remove(materiaId);
+                        if (swap != null && !hayConflictoHorario(swap.winnerHorarios(), horariosOcupados)) {
+                            MateriaAsignadaDTO winner = swap.winner();
+                            winner.addIntercambiable(MateriaIntercambiableDTO.builder()
+                                .materiaId(materia.getId()).nombre(materia.getNombre())
+                                .cuatrimestre(numCuatrimestre).build());
+                            dto.addIntercambiable(MateriaIntercambiableDTO.builder()
+                                .materiaId(winner.getMateriaId()).nombre(winner.getNombre())
+                                .cuatrimestre(swap.winnerCuatrimestre()).build());
+                        }
+
                         asignadas.add(dto);
                         horariosOcupados.addAll(elegida.getHorarios());
                     } else if (materia.isAnual()) {
@@ -240,8 +258,12 @@ public class PlanificadorService {
                         if (prevConflicto != null) dto.setConflictoCon(prevConflicto);
                         asignadas.add(dto);
                     } else {
-                        String chocaCon = findConflictoNombre(comisiones, asignadas, comisionesPorMateria);
-                        conflictosPendientes.put(materiaId, chocaCon);
+                        MateriaAsignadaDTO winner = findConflictoAsignada(comisiones, asignadas, comisionesPorMateria);
+                        conflictosPendientes.put(materiaId, winner != null ? winner.getNombre() : null);
+                        registrarSwapSiCorresponde(
+                            materiaId, comisiones, winner, pesoDependencia,
+                            horariosOcupados, comisionesPorMateria, turnos,
+                            numCuatrimestre, swapsPendientes);
                     }
                 } else if (!primerCuatrimestre) {
                     MateriaAsignadaDTO dto = MateriaAsignadaDTO.builder()
@@ -544,27 +566,82 @@ public class PlanificadorService {
 
     // ── Detección de conflictos ──
 
-    private String findConflictoNombre(
+    private MateriaAsignadaDTO findConflictoAsignada(
             List<Comision> comisionesMateria,
             List<MateriaAsignadaDTO> asignadas,
             Map<String, List<Comision>> comisionesPorMateria) {
 
         for (MateriaAsignadaDTO asignada : asignadas) {
-            if (asignada.getComisionId() == null) continue;
-            List<Horario> horariosAsignada = comisionesPorMateria
-                .getOrDefault(asignada.getMateriaId(), List.of()).stream()
-                .filter(c -> c.getComisionId().equals(asignada.getComisionId()))
-                .findFirst()
-                .map(Comision::getHorarios)
-                .orElse(List.of());
-
+            List<Horario> horariosAsignada = horariosDe(asignada, comisionesPorMateria);
             for (Comision c : comisionesMateria) {
                 if (hayConflictoHorario(c.getHorarios(), horariosAsignada)) {
-                    return asignada.getNombre();
+                    return asignada;
                 }
             }
         }
         return null;
+    }
+
+    // ── Intercambio de materias que chocan pero no bloquean nada ──
+
+    /**
+     * Datos de una materia diferida por choque de horario que quedó como candidata
+     * a intercambiarse con la que le ganó el slot: guarda la ganadora (para linkear
+     * de vuelta), en qué cuatrimestre quedó y sus horarios (para revalidar el swap
+     * cuando la diferida finalmente se ubique).
+     */
+    private record SwapPendiente(
+        MateriaAsignadaDTO winner,
+        int winnerCuatrimestre,
+        List<Horario> winnerHorarios) {}
+
+    /**
+     * Marca dos materias que chocan de horario como intercambiables cuando el orden
+     * en que se cursen es indistinto: ninguna bloquea correlativas a futuro (peso 0)
+     * y la diferida entraría en este mismo cuatrimestre si se saca a la ganadora.
+     * La otra mitad del chequeo (que la ganadora entre en el cuatrimestre donde caiga
+     * la diferida) se valida al ubicarla, antes de confirmar el link.
+     */
+    private void registrarSwapSiCorresponde(
+            String diferidaId,
+            List<Comision> comisionesDiferida,
+            MateriaAsignadaDTO winner,
+            Map<String, Integer> pesoDependencia,
+            List<Horario> horariosOcupados,
+            Map<String, List<Comision>> comisionesPorMateria,
+            List<String> turnos,
+            int numCuatrimestre,
+            Map<String, SwapPendiente> swapsPendientes) {
+
+        swapsPendientes.remove(diferidaId);
+        if (winner == null || winner.getMateriaId() == null) return;
+
+        boolean ningunaBloquea = pesoDependencia.getOrDefault(diferidaId, 0) == 0
+            && pesoDependencia.getOrDefault(winner.getMateriaId(), 0) == 0;
+        if (!ningunaBloquea) return;
+
+        List<Horario> winnerHorarios = horariosDe(winner, comisionesPorMateria);
+        List<Horario> ocupadosSinWinner = new ArrayList<>(horariosOcupados);
+        ocupadosSinWinner.removeAll(winnerHorarios);
+
+        boolean diferidaEntraSinWinner = comisionesDiferida.stream()
+            .filter(c -> comisionPermitidaPorTurno(c, turnos))
+            .anyMatch(c -> !hayConflictoHorario(c.getHorarios(), ocupadosSinWinner));
+        if (!diferidaEntraSinWinner) return;
+
+        swapsPendientes.put(diferidaId, new SwapPendiente(winner, numCuatrimestre, winnerHorarios));
+    }
+
+    private List<Horario> horariosDe(
+            MateriaAsignadaDTO asignada,
+            Map<String, List<Comision>> comisionesPorMateria) {
+        if (asignada.getComisionId() == null) return List.of();
+        return comisionesPorMateria
+            .getOrDefault(asignada.getMateriaId(), List.of()).stream()
+            .filter(c -> c.getComisionId().equals(asignada.getComisionId()))
+            .findFirst()
+            .map(Comision::getHorarios)
+            .orElse(List.of());
     }
 
     // ── Helpers ──

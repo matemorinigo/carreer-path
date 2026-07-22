@@ -30,6 +30,7 @@ export default function PlanView({
   cuatrimestreInicio,
   onActivarCazador,
   onAvanzarCuatri,
+  onIntercambiar,
   cazadorLoading,
 }) {
   const baseYear = getBaseYear()
@@ -189,6 +190,7 @@ export default function PlanView({
             baseYear={baseYear}
             cuatrimestreInicio={cuatrimestreInicio}
             ofertaFieldVisibility={ofertaFieldVisibility}
+            onIntercambiar={onIntercambiar}
           />
         ))}
       </div>

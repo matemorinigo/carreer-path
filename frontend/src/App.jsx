@@ -4,6 +4,7 @@ import PlanView from './components/PlanView'
 import NetworkMap from './components/NetworkMap'
 import cazadorImg from './assets/alfaro.jpeg'
 import { getCuatrimestreInicioActual } from './utils/cuatrimestre'
+import { swapMaterias } from './utils/intercambioPlan'
 
 const BASE_URL = import.meta.env.VITE_API_URL || ''
 const API_URL = `${BASE_URL}/api/planificador/generar`
@@ -175,6 +176,10 @@ export default function App() {
     clearCazadorState()
   }
 
+  function handleIntercambiar(idA, idB) {
+    setPlan((prev) => swapMaterias(prev, idA, idB))
+  }
+
   function handleReset() {
     setPlan(null)
     setError(null)
@@ -292,6 +297,7 @@ export default function App() {
                 cuatrimestreInicio={lastGenParams?.cuatrimestreInicio}
                 onActivarCazador={handleActivarCazador}
                 onAvanzarCuatri={handleAvanzarCuatri}
+                onIntercambiar={handleIntercambiar}
                 cazadorLoading={cazadorLoading}
               />
             ) : (

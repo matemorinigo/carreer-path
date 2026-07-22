@@ -1,3 +1,5 @@
+import { cuatriLabelCorto } from '../utils/cuatrimestre'
+
 const DAY_ORDER = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA']
 const DAY_MAP = {
   LU: 'Lunes',
@@ -14,7 +16,7 @@ function hasDisplayValue(value) {
   return true
 }
 
-export default function MateriaCard({ materia, ofertaFieldVisibility, selectable, selected, onToggle }) {
+export default function MateriaCard({ materia, ofertaFieldVisibility, selectable, selected, onToggle, onIntercambiar, cuatrimestreInicio = 1, baseYear }) {
   const {
     materiaId,
     nombre,
@@ -28,6 +30,7 @@ export default function MateriaCard({ materia, ofertaFieldVisibility, selectable
     estimado,
     conflictoCon,
     ofertaFueraDeTurno,
+    intercambiables,
   } = materia
 
   const visibility = ofertaFieldVisibility || {
@@ -153,6 +156,29 @@ export default function MateriaCard({ materia, ofertaFieldVisibility, selectable
         <p className="text-[11px] text-sky-400/70 leading-tight">
           ℹ Existe oferta fuera de tu turno: {ofertaFueraDeTurno}
         </p>
+      )}
+
+      {/* Materias intercambiables (chocan de horario pero no bloquean nada) */}
+      {Array.isArray(intercambiables) && intercambiables.length > 0 && (
+        <div className="space-y-1.5 pt-1">
+          {intercambiables.map((alt) => (
+            <div key={alt.materiaId} className="flex items-start gap-2">
+              <span className="text-[11px] text-teal-400/80 leading-tight flex-1">
+                ⇄ Se puede intercambiar con <span className="font-medium">{alt.nombre}</span>
+                {' '}({cuatriLabelCorto(alt.cuatrimestre, cuatrimestreInicio, baseYear)}) — chocan de
+                horario pero ninguna bloquea otras materias
+              </span>
+              {onIntercambiar && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onIntercambiar(materiaId, alt.materiaId) }}
+                  className="shrink-0 text-[11px] px-2 py-0.5 rounded-md border border-teal-500/40 text-teal-300 hover:bg-teal-500/15 transition-colors cursor-pointer"
+                >
+                  Intercambiar
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

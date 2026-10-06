@@ -2,6 +2,13 @@
 
 Un sistema modular y escalable para extraer, procesar e integrar planes de estudio universitarios de múltiples universidades. Agnóstico a la institución, flexible y extensible.
 
+
+> **Estado actual:** la app es 100% frontend (GitHub Pages). El planificador corre en el
+> navegador (`frontend/src/planner/`) y el plan de estudios y la oferta de comisiones vienen
+> empaquetados en `frontend/src/data/` (`planEstudios.json` y `ofertaComisiones.json`, copiados
+> de `scraper/output/plan_estudios.json` y `oferta_comisiones.json`). El backend Spring Boot
+> ya no se usa.
+
 ## 🏗️ Arquitectura del Monorepo
 
 ```

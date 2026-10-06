@@ -633,5 +633,17 @@
     "horas": 4,
     "esObligatoria": true,
     "esTransversal": true
+  },
+  {
+    "id": "3599",
+    "nombre": "Redes Móviles e IoT",
+    "correlativas": [
+      "3652",
+      "3653",
+      "3661"
+    ],
+    "horas": 4,
+    "esObligatoria": true,
+    "padreId": "3672"
   }
 ]

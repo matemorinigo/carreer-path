@@ -1,4 +1,5 @@
 import CuatrimestreCard from './CuatrimestreCard'
+import PlanTimelineEditable from './PlanTimelineEditable'
 import CazadorCuatrimestreActivo from './CazadorCuatrimestreActivo'
 import CazadorHistorial from './CazadorHistorial'
 import cazadorImg from '../assets/alfaro.jpeg'
@@ -31,7 +32,11 @@ export default function PlanView({
   onActivarCazador,
   onAvanzarCuatri,
   onIntercambiar,
-  cazadorLoading,
+  ctx,
+  onMover,
+  onDeshacer,
+  onRestaurar,
+  puedeDeshacer,
 }) {
   const baseYear = getBaseYear()
   const ofertaFieldVisibility = buildOfertaFieldVisibility(plan)
@@ -92,7 +97,6 @@ export default function PlanView({
             cuatrimestreInicio={cazadorState.cuatrimestreInicio}
             ofertaFieldVisibility={ofertaFieldVisibility}
             onAvanzar={onAvanzarCuatri}
-            loading={cazadorLoading}
           />
         )}
 
@@ -182,18 +186,33 @@ export default function PlanView({
       )}
 
       {/* Timeline */}
-      <div className="space-y-6">
-        {plan.cuatrimestres.map((cuatri) => (
-          <CuatrimestreCard
-            key={cuatri.numero}
-            cuatrimestre={cuatri}
-            baseYear={baseYear}
-            cuatrimestreInicio={cuatrimestreInicio}
-            ofertaFieldVisibility={ofertaFieldVisibility}
-            onIntercambiar={onIntercambiar}
-          />
-        ))}
-      </div>
+      {ctx && onMover ? (
+        <PlanTimelineEditable
+          plan={plan}
+          ctx={ctx}
+          baseYear={baseYear}
+          cuatrimestreInicio={cuatrimestreInicio}
+          ofertaFieldVisibility={ofertaFieldVisibility}
+          onMover={onMover}
+          onIntercambiar={onIntercambiar}
+          onDeshacer={onDeshacer}
+          onRestaurar={onRestaurar}
+          puedeDeshacer={puedeDeshacer}
+        />
+      ) : (
+        <div className="space-y-6">
+          {plan.cuatrimestres.map((cuatri) => (
+            <CuatrimestreCard
+              key={cuatri.numero}
+              cuatrimestre={cuatri}
+              baseYear={baseYear}
+              cuatrimestreInicio={cuatrimestreInicio}
+              ofertaFieldVisibility={ofertaFieldVisibility}
+              onIntercambiar={onIntercambiar}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

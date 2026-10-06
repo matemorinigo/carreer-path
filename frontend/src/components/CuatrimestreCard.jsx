@@ -17,7 +17,25 @@ function earliestDay(materia) {
   )
 }
 
-export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreInicio = 1, ofertaFieldVisibility, onIntercambiar }) {
+// Estilos del cuatrimestre mientras se arrastra una materia (ver PlanTimelineEditable).
+const DROP_STYLES = {
+  ok: 'outline-2 outline-dashed outline-emerald-500/40 bg-emerald-500/5',
+  okOver: 'outline-2 outline-emerald-400 bg-emerald-500/10',
+  bloqueado: 'opacity-40',
+  bloqueadoOver: 'outline-2 outline-red-500/60 bg-red-500/5',
+}
+
+export default function CuatrimestreCard({
+  cuatrimestre,
+  baseYear,
+  cuatrimestreInicio = 1,
+  ofertaFieldVisibility,
+  onIntercambiar,
+  renderMateria,
+  dropRef,
+  dropStatus,
+  dropMotivo,
+}) {
   const { numero, materias } = cuatrimestre
   const startYear = baseYear || new Date().getFullYear()
   const cuatrimestreReal = cuatrimestreInicio + numero - 1
@@ -32,7 +50,7 @@ export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreI
       {/* Timeline connector */}
       <div className="absolute left-6 top-0 bottom-0 w-px bg-neutral-800/50" />
 
-      <div className="relative pl-14">
+      <div ref={dropRef} className={`relative pl-14 rounded-xl outline-offset-4 transition-all ${dropStatus ? DROP_STYLES[dropStatus] : ''}`}>
         {/* Timeline dot */}
         <div className="absolute left-4 top-5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-neutral-950 z-10" />
 
@@ -45,9 +63,13 @@ export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreI
           </span>
         </div>
 
+        {dropMotivo && (
+          <p className="text-xs text-red-400 -mt-2 mb-3">✕ {dropMotivo}</p>
+        )}
+
         {/* Cards grid */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map((materia) => (
+          {sorted.map((materia) => renderMateria ? renderMateria(materia) : (
             <MateriaCard
               key={materia.materiaId}
               materia={materia}
@@ -57,6 +79,9 @@ export default function CuatrimestreCard({ cuatrimestre, baseYear, cuatrimestreI
               baseYear={baseYear}
             />
           ))}
+          {materias.length === 0 && (
+            <p className="text-sm text-neutral-600 italic py-4">Cuatrimestre libre</p>
+          )}
         </div>
       </div>
     </div>

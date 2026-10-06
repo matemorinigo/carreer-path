@@ -19,7 +19,7 @@ function esContinuacionAnual(materia) {
   return materia.anual && materia.sinOferta
 }
 
-export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, cuatrimestreInicio = 1, ofertaFieldVisibility, onAvanzar, loading }) {
+export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, cuatrimestreInicio = 1, ofertaFieldVisibility, onAvanzar }) {
   const { numero, materias } = cuatrimestre
 
   const materiasSeleccionables = materias.filter(m => !esContinuacionAnual(m))
@@ -103,10 +103,9 @@ export default function CazadorCuatrimestreActivo({ cuatrimestre, baseYear, cuat
         </p>
         <button
           onClick={handleAvanzar}
-          disabled={loading}
-          className="px-6 py-2.5 rounded-lg bg-fuchsia-600 hover:bg-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium cursor-pointer"
+          className="px-6 py-2.5 rounded-lg bg-fuchsia-600 hover:bg-fuchsia-500 transition-colors text-sm font-medium cursor-pointer"
         >
-          {loading ? 'Recalculando...' : 'Avanzar cuatrimestre →'}
+          Avanzar cuatrimestre →
         </button>
       </div>
     </div>

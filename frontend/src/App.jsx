@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import HistoriaUpload from './components/HistoriaUpload'
 import PlanView from './components/PlanView'
 import NetworkMap from './components/NetworkMap'
 import cazadorImg from './assets/alfaro.jpeg'
 import { getCuatrimestreInicioActual } from './utils/cuatrimestre'
 import { swapMaterias } from './utils/intercambioPlan'
+import { generarPlan, crearContexto } from './planner/planificador'
+import { moverMateria, normalizarIntercambiables } from './planner/moverMateria'
 
-const BASE_URL = import.meta.env.VITE_API_URL || ''
-const API_URL = `${BASE_URL}/api/planificador/generar`
 const CAZADOR_STORAGE_KEY = 'cazador-utopias-state'
 
 function loadCazadorState() {
@@ -29,58 +29,39 @@ function clearCazadorState() {
 
 export default function App() {
   const [plan, setPlan] = useState(null)
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [cazadorMode, setCazadorMode] = useState(false)
   const [cazadorState, setCazadorState] = useState(null)
-  const [cazadorLoading, setCazadorLoading] = useState(false)
-  const [resumePrompt, setResumePrompt] = useState(null)
+  const [resumePrompt, setResumePrompt] = useState(loadCazadorState)
   const [lastGenParams, setLastGenParams] = useState(null)
   const [viewMode, setViewMode] = useState('plan')
+  // Planes previos a cada cambio manual (drag & drop / intercambio), para deshacer.
+  const [planesPrevios, setPlanesPrevios] = useState([])
 
-  useEffect(() => {
-    const saved = loadCazadorState()
-    if (saved) setResumePrompt(saved)
-  }, [])
+  const ctx = useMemo(() => (lastGenParams ? crearContexto(lastGenParams) : null), [lastGenParams])
 
-  async function fetchPlan(historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio = 1) {
-    const body = { historia, maxMaterias, turnos, cuatrimestreInicio }
-    if (ofertaCustom) body.ofertaCustom = ofertaCustom
-
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-
-    if (!res.ok) {
-      let msg = 'Error inesperado del servidor'
-      try {
-        const errBody = await res.json()
-        if (errBody.error) msg = errBody.error
-      } catch { /* response wasn't JSON */ }
-      throw new Error(msg)
+  function calcularPlan(historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio = 1) {
+    try {
+      return generarPlan({ historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio })
+    } catch (err) {
+      console.error('Error generando plan', err)
+      throw new Error('No se pudo generar el plan. Verificá que la historia académica sea válida.')
     }
-
-    return res.json()
   }
 
-  async function handleGenerar(historia, maxMaterias, turnos, ofertaCustom) {
-    setLoading(true)
+  function handleGenerar(historia, maxMaterias, turnos, ofertaCustom) {
     setError(null)
-    setPlan(null)
-
     try {
       const cuatrimestreInicio = getCuatrimestreInicioActual()
-      const data = await fetchPlan(historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio)
+      const data = calcularPlan(historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio)
       setPlan(data)
+      setPlanesPrevios([])
       setLastGenParams({ historia, maxMaterias, turnos, ofertaCustom, cuatrimestreInicio })
       setCazadorMode(false)
       setCazadorState(null)
     } catch (err) {
+      setPlan(null)
       setError(err.message)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -95,11 +76,11 @@ export default function App() {
     }
     setCazadorMode(true)
     setCazadorState(state)
+    setPlanesPrevios([])
     saveCazadorState(state)
   }
 
-  async function handleAvanzarCuatri(materiasConResultado) {
-    setCazadorLoading(true)
+  function handleAvanzarCuatri(materiasConResultado) {
     try {
       const aprobadas = materiasConResultado.filter(m => m.aprobada)
 
@@ -126,7 +107,7 @@ export default function App() {
 
       const cuatrimestreReal = cazadorState.cuatrimestreInicio + newState.cuatrisResueltos.length
 
-      const data = await fetchPlan(
+      const data = calcularPlan(
         historiaActualizada,
         newState.maxMaterias,
         newState.turnos,
@@ -139,21 +120,18 @@ export default function App() {
       saveCazadorState(newState)
     } catch (err) {
       setError(err.message)
-    } finally {
-      setCazadorLoading(false)
     }
   }
 
-  async function handleResumeCazador() {
+  function handleResumeCazador() {
     const saved = resumePrompt
     setResumePrompt(null)
-    setLoading(true)
     setError(null)
 
     try {
       const cuatrimestreReal = (saved.cuatrimestreInicio || 1) + (saved.cuatrisResueltos?.length || 0)
 
-      const data = await fetchPlan(
+      const data = calcularPlan(
         saved.historiaAcumulada,
         saved.maxMaterias,
         saved.turnos,
@@ -166,8 +144,6 @@ export default function App() {
       setCazadorState(saved)
     } catch (err) {
       setError(err.message)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -176,8 +152,31 @@ export default function App() {
     clearCazadorState()
   }
 
+  function aplicarCambioManual(nuevoPlan) {
+    if (!nuevoPlan || nuevoPlan === plan) return
+    setPlanesPrevios((prev) => [...prev, plan])
+    setPlan(nuevoPlan)
+  }
+
   function handleIntercambiar(idA, idB) {
-    setPlan((prev) => swapMaterias(prev, idA, idB))
+    const swapped = swapMaterias(plan, idA, idB)
+    aplicarCambioManual(ctx ? normalizarIntercambiables(swapped, ctx) : swapped)
+  }
+
+  function handleMover(materiaId, destino) {
+    aplicarCambioManual(moverMateria(plan, materiaId, destino, ctx).plan)
+  }
+
+  function handleDeshacer() {
+    if (planesPrevios.length === 0) return
+    setPlan(planesPrevios[planesPrevios.length - 1])
+    setPlanesPrevios((prev) => prev.slice(0, -1))
+  }
+
+  function handleRestaurar() {
+    if (planesPrevios.length === 0) return
+    setPlan(planesPrevios[0])
+    setPlanesPrevios([])
   }
 
   function handleReset() {
@@ -186,6 +185,7 @@ export default function App() {
     setCazadorMode(false)
     setCazadorState(null)
     setViewMode('plan')
+    setPlanesPrevios([])
     clearCazadorState()
   }
 
@@ -218,7 +218,7 @@ export default function App() {
 
       <main className="max-w-6xl mx-auto px-6 py-10">
         {/* Resume prompt */}
-        {resumePrompt && !plan && !loading && (
+        {resumePrompt && !plan && (
           <div className="bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-xl p-6 mb-8">
             <p className="text-fuchsia-300 font-medium mb-1">
               Tenés una sesión del Cazador de Utopias en curso
@@ -243,11 +243,9 @@ export default function App() {
           </div>
         )}
 
-        {!plan && !loading && (
+        {!plan && (
           <HistoriaUpload onGenerar={handleGenerar} />
         )}
-
-        {loading && <LoadingScreen />}
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
@@ -298,7 +296,11 @@ export default function App() {
                 onActivarCazador={handleActivarCazador}
                 onAvanzarCuatri={handleAvanzarCuatri}
                 onIntercambiar={handleIntercambiar}
-                cazadorLoading={cazadorLoading}
+                ctx={cazadorMode ? null : ctx}
+                onMover={handleMover}
+                onDeshacer={handleDeshacer}
+                onRestaurar={handleRestaurar}
+                puedeDeshacer={planesPrevios.length > 0}
               />
             ) : (
               <NetworkMap historia={lastGenParams?.historia || []} />
@@ -306,43 +308,6 @@ export default function App() {
           </>
         )}
       </main>
-    </div>
-  )
-}
-
-const LOADING_PHRASES = [
-  'Tranquilo, no te me apures que no vas a terminar la carrera antes de que cargue',
-  'Calculando cuántos cuatrimestres te faltan para ser libre...',
-  'Analizando correlativas como si fuera un grafo de la NASA...',
-  'Buscando comisiones que no te arruinen la vida...',
-  'Esquivando choques de horario como un campeón...',
-  'Rezándole a la UNLaM para que no cambie las correlativas...',
-  'Optimizando tu sufrimiento académico...',
-  'Preparando el plan que ojalá la universidad no te rompa...',
-]
-
-function LoadingScreen() {
-  const [phraseIdx, setPhraseIdx] = useState(() =>
-    Math.floor(Math.random() * LOADING_PHRASES.length),
-  )
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPhraseIdx((prev) => {
-        let next
-        do { next = Math.floor(Math.random() * LOADING_PHRASES.length) } while (next === prev)
-        return next
-      })
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
-
-  return (
-    <div className="flex flex-col items-center justify-center py-32 gap-6">
-      <div className="w-14 h-14 border-4 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
-      <p className="text-neutral-400 text-center max-w-md leading-relaxed animate-pulse">
-        {LOADING_PHRASES[phraseIdx]}
-      </p>
     </div>
   )
 }

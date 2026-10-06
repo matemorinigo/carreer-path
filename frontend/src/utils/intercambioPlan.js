@@ -1,6 +1,6 @@
 // Intercambia dos materias entre sus cuatrimestres dentro de un plan.
 //
-// El backend sólo marca como `intercambiables` a materias que chocan de horario
+// El planificador sólo marca como `intercambiables` a materias que chocan de horario
 // pero no bloquean correlativas a futuro, así que mover una al cuatrimestre de la
 // otra (y viceversa) no altera el resto del plan: cada card conserva su comisión
 // y horario, sólo cambia de cuatrimestre. Devuelve un plan nuevo (inmutable).

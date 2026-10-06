@@ -8,9 +8,4 @@ export default defineConfig({
   build: {
     target: ['es2020', 'safari14'],
   },
-  server: {
-    proxy: {
-      '/api': 'http://localhost:8080',
-    },
-  },
 })

@@ -118,6 +118,15 @@ export function getMaterias() {
   return MATERIAS
 }
 
+// Las demás opciones que cubren el mismo requisito que una electiva: todo el
+// pool compartido (I/II/III) si es de ahí, o las hermanas del mismo slot.
+export function alternativasDeElectiva(materiaId) {
+  const m = MATERIAS.get(materiaId)
+  if (!m?.padreId) return []
+  const grupos = ELECTIVA_SLOTS_COMPARTIDOS.has(m.padreId) ? [...ELECTIVA_SLOTS_COMPARTIDOS] : [m.padreId]
+  return grupos.flatMap((g) => HIJAS.get(g) || []).filter((x) => x.id !== materiaId)
+}
+
 // Requisitos para cursar una materia: sus correlativas más las del slot de
 // electiva al que pertenece (si es una opción de electiva).
 export function requisitosDe(materiaId) {

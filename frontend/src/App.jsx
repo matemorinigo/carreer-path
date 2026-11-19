@@ -6,7 +6,7 @@ import cazadorImg from './assets/alfaro.jpeg'
 import { getCuatrimestreInicioActual } from './utils/cuatrimestre'
 import { swapMaterias } from './utils/intercambioPlan'
 import { generarPlan, crearContexto } from './planner/planificador'
-import { moverMateria, normalizarIntercambiables } from './planner/moverMateria'
+import { moverMateria, normalizarIntercambiables, cambiarElectiva } from './planner/moverMateria'
 
 const CAZADOR_STORAGE_KEY = 'cazador-utopias-state'
 
@@ -167,6 +167,10 @@ export default function App() {
     aplicarCambioManual(moverMateria(plan, materiaId, destino, ctx).plan)
   }
 
+  function handleCambiarElectiva(materiaId, nuevaId) {
+    aplicarCambioManual(cambiarElectiva(plan, materiaId, nuevaId, ctx).plan)
+  }
+
   function handleDeshacer() {
     if (planesPrevios.length === 0) return
     setPlan(planesPrevios[planesPrevios.length - 1])
@@ -298,6 +302,7 @@ export default function App() {
                 onIntercambiar={handleIntercambiar}
                 ctx={cazadorMode ? null : ctx}
                 onMover={handleMover}
+              onCambiarElectiva={handleCambiarElectiva}
                 onDeshacer={handleDeshacer}
                 onRestaurar={handleRestaurar}
                 puedeDeshacer={planesPrevios.length > 0}

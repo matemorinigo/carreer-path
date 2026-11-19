@@ -34,6 +34,7 @@ export default function PlanView({
   onIntercambiar,
   ctx,
   onMover,
+  onCambiarElectiva,
   onDeshacer,
   onRestaurar,
   puedeDeshacer,
@@ -194,6 +195,7 @@ export default function PlanView({
           cuatrimestreInicio={cuatrimestreInicio}
           ofertaFieldVisibility={ofertaFieldVisibility}
           onMover={onMover}
+          onCambiarElectiva={onCambiarElectiva}
           onIntercambiar={onIntercambiar}
           onDeshacer={onDeshacer}
           onRestaurar={onRestaurar}

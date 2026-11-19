@@ -10,6 +10,7 @@ import {
   comisionPermitidaPorTurno,
   distanciaPrimero,
   buildMateriaAsignada,
+  alternativasDeElectiva,
 } from './planificador'
 import { swapMaterias } from '../utils/intercambioPlan'
 
@@ -23,11 +24,11 @@ function locate(plan, materiaId) {
 
 // Primer y último cuatrimestre (índice) donde aparece cada materia. Una anual
 // aparece en dos: arranca en el primero y recién se aprueba al final del segundo.
-function posiciones(plan, excluirId) {
+function posiciones(plan, ...excluir) {
   const pos = new Map()
   plan.cuatrimestres.forEach((c, ci) => {
     for (const m of c.materias) {
-      if (m.materiaId === excluirId) continue
+      if (excluir.includes(m.materiaId)) continue
       const p = pos.get(m.materiaId)
       if (p) p.fin = ci
       else pos.set(m.materiaId, { inicio: ci, fin: ci })
@@ -88,6 +89,13 @@ export function evaluarMovimiento(plan, materiaId, destino, ctx) {
   if (motivoCorrelativas) return { ok: false, motivo: motivoCorrelativas }
 
   const otras = (plan.cuatrimestres[destino]?.materias || []).filter((m) => m.materiaId !== materiaId)
+  return elegirComision(plan, materiaId, destino, ctx, otras, loc.card.comisionId)
+}
+
+// Comisión con la que `materiaId` entra en el cuatrimestre `destino` junto a
+// `otras` (respetando turnos y sin choques). Si la que ya tenía (`preferida`)
+// sigue entrando, se conserva. Sin oferta sólo vale en cuatrimestres estimados.
+function elegirComision(plan, materiaId, destino, ctx, otras, preferida) {
   const ocupados = otras.flatMap(horariosDeCard)
 
   const comisiones = ctx.comisionesPorMateria.get(materiaId) || []
@@ -105,7 +113,7 @@ export function evaluarMovimiento(plan, materiaId, destino, ctx) {
   }
 
   const libres = candidatas.filter((c) => !hayConflictoHorario(c.horarios, ocupados))
-  const comision = libres.find((c) => c.comisionId === loc.card.comisionId) || libres[0]
+  const comision = libres.find((c) => c.comisionId === preferida) || libres[0]
   if (!comision) {
     const choque = otras.find((m) => hayConflictoHorario(candidatas[0].horarios, horariosDeCard(m)))
     return {
@@ -152,6 +160,109 @@ export function moverMateria(plan, materiaId, destino, ctx) {
 
   const nuevo = { ...plan, cuatrimestres: cuatris, totalCuatrimestres: cuatris.length }
   return { plan: normalizarIntercambiables(nuevo, ctx) }
+}
+
+// ── Elegir qué electiva cursar ──
+
+// Card de una electiva puesta en lugar de otra. Arranca sin "movida por
+// choque" ni intercambios: esos datos eran de la materia reemplazada.
+function cardElectiva(plan, materiaId, ci, comision) {
+  const materia = getMaterias().get(materiaId)
+  if (!comision) {
+    return {
+      ...buildMateriaAsignada(materia, { comisionId: null, sede: null, modalidad: null, horarios: [] }),
+      horarios: null,
+      sinOferta: true,
+    }
+  }
+  return { ...buildMateriaAsignada(materia, comision), estimado: !esCuatriConOfertaReal(plan, ci) }
+}
+
+const minusculaInicial = (s) => s.charAt(0).toLowerCase() + s.slice(1)
+
+/**
+ * Evalúa cursar la electiva `nuevaId` en lugar de `materiaId` (otra opción que
+ * cubre el mismo requisito), en el cuatrimestre donde está esta. Si `nuevaId`
+ * ya está en otro cuatrimestre del plan es un intercambio: cada una pasa al
+ * lugar de la otra. Devuelve { ok: true, comision, intercambio } (intercambio:
+ * null o { comision } de la que se va al otro cuatrimestre) o { ok: false, motivo }.
+ */
+export function evaluarCambioElectiva(plan, materiaId, nuevaId, ctx) {
+  const loc = locate(plan, materiaId)
+  if (!loc) return { ok: false, motivo: 'Materia no encontrada en el plan' }
+  if (!alternativasDeElectiva(materiaId).some((m) => m.id === nuevaId)) {
+    return { ok: false, motivo: 'No es una opción de la misma electiva' }
+  }
+  if (ctx.aprobadas.has(nuevaId)) return { ok: false, motivo: 'Ya la aprobaste' }
+
+  const otraLoc = locate(plan, nuevaId)
+  if (otraLoc?.ci === loc.ci) return { ok: false, motivo: 'Ya la cursás en este mismo cuatrimestre' }
+
+  const pos = posiciones(plan, materiaId, nuevaId)
+  const restoDe = (ci) => plan.cuatrimestres[ci].materias
+    .filter((m) => m.materiaId !== materiaId && m.materiaId !== nuevaId)
+
+  const motivoCorrelativas = chequearCorrelativas(plan, nuevaId, loc.ci, ctx, pos)
+  if (motivoCorrelativas) return { ok: false, motivo: motivoCorrelativas }
+  const aca = elegirComision(plan, nuevaId, loc.ci, ctx, restoDe(loc.ci), otraLoc?.card.comisionId)
+  if (!aca.ok) return aca
+  if (!otraLoc) return { ok: true, comision: aca.comision, intercambio: null }
+
+  const motivoAlla = chequearCorrelativas(plan, materiaId, otraLoc.ci, ctx, pos)
+  const alla = motivoAlla
+    ? { ok: false, motivo: motivoAlla }
+    : elegirComision(plan, materiaId, otraLoc.ci, ctx, restoDe(otraLoc.ci), loc.card.comisionId)
+  if (!alla.ok) {
+    return { ok: false, motivo: `${loc.card.nombre} no entraría en su lugar: ${minusculaInicial(alla.motivo)}` }
+  }
+  return { ok: true, comision: aca.comision, intercambio: { comision: alla.comision } }
+}
+
+/**
+ * Opciones para cambiar la electiva `materiaId` por otra que cubra el mismo
+ * requisito (sin las ya aprobadas ni las que ya se cursan en ese mismo
+ * cuatrimestre). Cada una trae su evaluación, los horarios con los que
+ * quedaría y, si ya está en otro cuatrimestre del plan, el número de ese.
+ */
+export function opcionesElectiva(plan, materiaId, ctx) {
+  const loc = locate(plan, materiaId)
+  if (!loc) return []
+  return alternativasDeElectiva(materiaId)
+    .filter((m) => !ctx.aprobadas.has(m.id))
+    .map((m) => ({ m, otra: locate(plan, m.id) }))
+    .filter(({ otra }) => otra?.ci !== loc.ci)
+    .map(({ m, otra }) => {
+      const ev = evaluarCambioElectiva(plan, materiaId, m.id, ctx)
+      const preview = ev.ok ? cardElectiva(plan, m.id, loc.ci, ev.comision) : null
+      return {
+        materiaId: m.id,
+        nombre: m.nombre,
+        ok: ev.ok,
+        motivo: ev.ok ? null : ev.motivo,
+        horarios: preview?.horarios ?? null,
+        modalidad: preview?.modalidad ?? null,
+        enCuatrimestre: otra ? plan.cuatrimestres[otra.ci].numero : null,
+      }
+    })
+}
+
+/**
+ * Cursa la electiva `nuevaId` en lugar de `materiaId` (o las intercambia si
+ * `nuevaId` ya estaba en otro cuatrimestre). Devuelve { plan } o { error }.
+ */
+export function cambiarElectiva(plan, materiaId, nuevaId, ctx) {
+  const ev = evaluarCambioElectiva(plan, materiaId, nuevaId, ctx)
+  if (!ev.ok) return { error: ev.motivo }
+
+  const loc = locate(plan, materiaId)
+  const otra = locate(plan, nuevaId)
+  const cuatris = plan.cuatrimestres.map((c) => ({ ...c, materias: [...c.materias] }))
+  cuatris[loc.ci].materias[loc.mi] = cardElectiva(plan, nuevaId, loc.ci, ev.comision)
+  if (ev.intercambio) {
+    cuatris[otra.ci].materias[otra.mi] = cardElectiva(plan, materiaId, otra.ci, ev.intercambio.comision)
+  }
+
+  return { plan: normalizarIntercambiables({ ...plan, cuatrimestres: cuatris }, ctx) }
 }
 
 // Una materia en su lugar actual cumple correlativas y no choca de horario

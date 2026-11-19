@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { cuatriLabelCorto } from '../utils/cuatrimestre'
 
 const DAY_ORDER = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA']
@@ -16,7 +17,7 @@ function hasDisplayValue(value) {
   return true
 }
 
-export default function MateriaCard({ materia, ofertaFieldVisibility, selectable, selected, onToggle, onIntercambiar, cuatrimestreInicio = 1, baseYear }) {
+export default function MateriaCard({ materia, ofertaFieldVisibility, selectable, selected, onToggle, onIntercambiar, electivaOpciones, onCambiarElectiva, cuatrimestreInicio = 1, baseYear }) {
   const {
     materiaId,
     nombre,
@@ -179,6 +180,89 @@ export default function MateriaCard({ materia, ofertaFieldVisibility, selectable
             </div>
           ))}
         </div>
+      )}
+
+      {/* Elegir qué electiva cursar (otra opción que cubre el mismo requisito) */}
+      {onCambiarElectiva && Array.isArray(electivaOpciones) && electivaOpciones.length > 0 && (
+        <ElectivaSelector
+          materiaId={materiaId}
+          opciones={electivaOpciones}
+          onCambiar={onCambiarElectiva}
+          cuatrimestreInicio={cuatrimestreInicio}
+          baseYear={baseYear}
+        />
+      )}
+    </div>
+  )
+}
+
+function resumenHorarios(horarios) {
+  if (!horarios || horarios.length === 0) return null
+  return [...horarios]
+    .sort((a, b) => DAY_ORDER.indexOf(a.dia) - DAY_ORDER.indexOf(b.dia))
+    .map((h) => (h.horaInicio ? `${DAY_MAP[h.dia] || h.dia} ${h.horaInicio}–${h.horaFin}` : h.dia))
+    .join(', ')
+}
+
+function ElectivaSelector({ materiaId, opciones, onCambiar, cuatrimestreInicio, baseYear }) {
+  const [abierto, setAbierto] = useState(false)
+  const disponibles = opciones.filter((o) => o.ok).length
+
+  return (
+    <div className="pt-1 border-t border-neutral-800/60">
+      <button
+        onClick={(e) => { e.stopPropagation(); setAbierto((v) => !v) }}
+        aria-expanded={abierto}
+        className="w-full flex items-center gap-2 pt-2 text-[11px] text-fuchsia-300/90 hover:text-fuchsia-200 transition-colors cursor-pointer"
+      >
+        <span>⇄ Cambiar por otra electiva</span>
+        <span className="text-neutral-500">
+          ({disponibles} {disponibles === 1 ? 'disponible' : 'disponibles'})
+        </span>
+        <span className={`ml-auto transition-transform ${abierto ? 'rotate-180' : ''}`}>▾</span>
+      </button>
+
+      {abierto && (
+        <ul className="mt-2 space-y-1.5">
+          {opciones.map((o) => {
+            const horario = resumenHorarios(o.horarios)
+            return (
+              <li
+                key={o.materiaId}
+                className={`flex items-start gap-2 rounded-lg px-2 py-1.5 ${
+                  o.ok ? 'bg-fuchsia-500/5 border border-fuchsia-500/20' : 'bg-neutral-900/40 border border-neutral-800/60'
+                }`}
+              >
+                <div className="flex-1 min-w-0 text-[11px] leading-tight space-y-0.5">
+                  <p className={`font-medium ${o.ok ? 'text-neutral-200' : 'text-neutral-500'}`}>{o.nombre}</p>
+                  {o.ok ? (
+                    <>
+                      <p className="text-neutral-500">
+                        {horario || 'Sin oferta cargada (estimada)'}
+                        {o.modalidad && ` · ${o.modalidad}`}
+                      </p>
+                      {o.enCuatrimestre != null && (
+                        <p className="text-teal-400/80">
+                          Ya está en {cuatriLabelCorto(o.enCuatrimestre, cuatrimestreInicio, baseYear)}: se intercambian
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-red-400/70">✕ {o.motivo}</p>
+                  )}
+                </div>
+                {o.ok && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onCambiar(materiaId, o.materiaId) }}
+                    className="shrink-0 text-[11px] px-2 py-0.5 rounded-md border border-fuchsia-500/40 text-fuchsia-300 hover:bg-fuchsia-500/15 transition-colors cursor-pointer"
+                  >
+                    {o.enCuatrimestre != null ? 'Intercambiar' : 'Elegir'}
+                  </button>
+                )}
+              </li>
+            )
+          })}
+        </ul>
       )}
     </div>
   )

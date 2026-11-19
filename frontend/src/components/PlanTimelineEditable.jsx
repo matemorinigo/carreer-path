@@ -11,7 +11,7 @@ import {
 } from '@dnd-kit/core'
 import CuatrimestreCard from './CuatrimestreCard'
 import MateriaCard from './MateriaCard'
-import { evaluarMovimiento } from '../planner/moverMateria'
+import { evaluarMovimiento, opcionesElectiva } from '../planner/moverMateria'
 
 // Timeline del plan donde se pueden arrastrar materias entre cuatrimestres.
 // Al empezar a arrastrar se evalúa cada cuatrimestre destino (correlativas y
@@ -23,6 +23,7 @@ export default function PlanTimelineEditable({
   cuatrimestreInicio,
   ofertaFieldVisibility,
   onMover,
+  onCambiarElectiva,
   onIntercambiar,
   onDeshacer,
   onRestaurar,
@@ -81,7 +82,7 @@ export default function PlanTimelineEditable({
       <div className="flex flex-wrap items-center gap-3 bg-neutral-900/40 border border-neutral-800 rounded-xl px-4 py-3 mb-6">
         <p className="text-xs text-neutral-500 flex-1 min-w-48">
           Arrastrá una materia a otro cuatrimestre para reacomodar el plan (en el celu, mantené apretado).
-          Se respetan correlativas y horarios.
+          Se respetan correlativas y horarios. En las electivas podés elegir cuál cursar.
         </p>
         {puedeDeshacer && (
           <div className="flex gap-2">
@@ -117,6 +118,10 @@ export default function PlanTimelineEditable({
                   materia={materia}
                   ofertaFieldVisibility={ofertaFieldVisibility}
                   onIntercambiar={onIntercambiar}
+                  electivaOpciones={materia.electiva && onCambiarElectiva
+                    ? opcionesElectiva(plan, materia.materiaId, ctx)
+                    : null}
+                  onCambiarElectiva={onCambiarElectiva}
                   cuatrimestreInicio={cuatrimestreInicio}
                   baseYear={baseYear}
                 />
